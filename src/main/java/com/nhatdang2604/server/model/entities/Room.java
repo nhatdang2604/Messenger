@@ -1,4 +1,4 @@
-package com.nhatdang2604.entities;
+package com.nhatdang2604.server.model.entities;
 
 import java.io.Serializable;
 import java.util.Set;
