@@ -18,7 +18,6 @@ public enum ClientDAO {
 		factory = HibernateUtil.INSTANCE.getSessionFactory();
 	}
 	
-
 	public Client getUserByUserLoginModel(LoginFormModel model) {
 
 		Session session = factory.getCurrentSession();
