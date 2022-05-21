@@ -16,7 +16,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "message")
-public class Message implements Serializable, Comparable<Message> {
+public class Message implements ISendable, Serializable, Comparable<Message> {
 
 	/**
 	 * 
@@ -26,6 +26,9 @@ public class Message implements Serializable, Comparable<Message> {
 	//Types of message
 	public static final int TYPE_TEXT = 0;
 	public static final int TYPE_FILE = 1;
+	
+	@Override
+	public int getType() {return ISendable.TYPE_MESSAGE;}
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,8 +64,8 @@ public class Message implements Serializable, Comparable<Message> {
 	@Column(name = "content")
 	private String content;
 	
-	@Column(name = "type")
-	private Integer type;
+	@Column(name = "data_type")
+	private Integer dataType;
 	
 	@Column(name = "date_time")
 	private LocalDateTime datetime;
@@ -116,12 +119,12 @@ public class Message implements Serializable, Comparable<Message> {
 		this.content = content;
 	}
 
-	public Integer getType() {
-		return type;
+	public Integer getDataType() {
+		return dataType;
 	}
 
-	public void setType(Integer type) {
-		this.type = type;
+	public void setDataType(Integer dataType) {
+		this.dataType = dataType;
 	}
 
 	public LocalDateTime getDateTime() {

@@ -3,10 +3,9 @@ package com.nhatdang2604.client.service;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
-import com.nhatdang2604.server.dao.MessageDAO;
 import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.model.entities.ISendable;
 import com.nhatdang2604.server.model.entities.Message;
 import com.nhatdang2604.server.model.entities.Room;
 
@@ -18,20 +17,20 @@ public enum MessageService {
 		//do nothing
 	}
 
-	//Recieve a message from a client
-	public Message recieve(Client client) {
+	//Recieve a package for client
+	public ISendable recieve(Client client) {
 		
-		Message message = null;
+		ISendable pack = null;
 		try {
 			
 			ObjectInputStream reader = client.getReader();
-			message = (Message) reader.readObject();
+			pack = (ISendable) reader.readObject();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return message;
+		return pack;
 	}
 	
 	//Send a message, and inject the client, room into the message

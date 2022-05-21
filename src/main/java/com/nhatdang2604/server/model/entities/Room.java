@@ -18,13 +18,17 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "room")
-public class Room implements Serializable, Comparable<Room> {
+public class Room implements ISendable, Serializable, Comparable<Room> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8425517911748684988L;
 
+	@Override
+	public int getType() {return ISendable.TYPE_ROOM;}
+	
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")

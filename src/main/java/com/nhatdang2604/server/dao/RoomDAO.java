@@ -64,5 +64,24 @@ public enum RoomDAO {
 		
 		
 	}
+
+	public Room find(Integer id) {
+		Session session = factory.getCurrentSession();
+		Room room = null;
+		
+		try {
+			session.beginTransaction();
+			room = session.get(Room.class, id);
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+		
+		return room;
+	}
 	
 }

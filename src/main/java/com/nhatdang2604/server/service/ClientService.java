@@ -49,7 +49,7 @@ public enum ClientService {
 
 	//Register a client account
 	public Client register(Client client) {
-		return clientDAO.createClient(client);
+		return clientDAO.create(client);
 	}
 	
 }

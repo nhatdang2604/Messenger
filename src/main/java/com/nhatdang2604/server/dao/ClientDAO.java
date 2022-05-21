@@ -54,7 +54,7 @@ public enum ClientDAO {
 	}
 	
 	//Create a client account
-	public Client createClient(Client client) {
+	public Client create(Client client) {
 		Session session = factory.getCurrentSession();
 		
 		try {

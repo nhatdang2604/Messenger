@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import com.nhatdang2604.server.dao.MessageDAO;
 import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.model.entities.ISendable;
 import com.nhatdang2604.server.model.entities.Message;
 
 public enum MessageService {
@@ -23,31 +24,35 @@ public enum MessageService {
 	}
 
 	//Recieve a message from a client
-	public Message recieve(Client client) {
-		
-		Socket socket = client.getSocket();
-		Message message = null;
-		try {
-			ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
-			message = (Message) inStream.readObject();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return message;
+//	public Message recieve(Socket socket) {
+//		
+//		Message message = null;
+//		try {
+//			ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
+//			ISendable pack = (ISendable) inStream.readObject();
+//			if (ISendable.TYPE_MESSAGE == pack.getType()) {
+//				message = (Message) inStream.readObject();
+//			    message = messageDAO.create(message);
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return message;
+//	}
+	
+	public Message createMessage(Message message) {
+		return messageDAO.create(message);
 	}
 	
-	//Send a message into the database and broadcasting
-	public Message send(Message message) {
-		
-		Socket socket = message.getClient().getSocket();
+	//Send a message to a client
+	public Message send(Message message, Client client) {
 		
 		try {
-			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-			output.writeObject(message);
-		    output.flush();
-		    message = messageDAO.createMessage(message);
+			ObjectOutputStream writer = client.getWriter();
+			writer.writeObject(message);
+			writer.flush();
 		    
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,5 +61,5 @@ public enum MessageService {
        
 		return message;
 	}
-	
+
 }

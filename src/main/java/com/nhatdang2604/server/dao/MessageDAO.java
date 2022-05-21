@@ -16,9 +16,8 @@ public enum MessageDAO {
 		factory = HibernateUtil.INSTANCE.getSessionFactory();
 	}
 	
-	
 	//Create a message
-	public Message createMessage(Message message) {
+	public Message create(Message message) {
 		Session session = factory.getCurrentSession();
 		
 		try {
@@ -37,6 +36,5 @@ public enum MessageDAO {
 		
 		return message;
 	}
-	
 	
 }
