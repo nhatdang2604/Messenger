@@ -2,6 +2,8 @@ package com.nhatdang2604.server.service;
 
 import com.nhatdang2604.server.dao.ClientDAO;
 import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.model.entities.Room;
 import com.nhatdang2604.server.model.formModel.LoginFormModel;
 
 public enum ClientService {
@@ -9,11 +11,13 @@ public enum ClientService {
 	INSTANCE;
 	
 	private ClientDAO clientDAO;
+	private MessageService messageService;
 	
 	private ClientService() {
 		
 		//Inject the session factory from hibernate utility
 		clientDAO = ClientDAO.INSTANCE;
+		messageService = MessageService.INSTANCE;
 	}
 	
 	//Helper to compare a model from login form and client
@@ -43,10 +47,27 @@ public enum ClientService {
 		return client;
 	}
 
+	public Message send(Client client, Room room, Message message) {
+		
+		message.setClient(client);
+		message.setRoom(room);
+		
+		return messageService.send(message);
+	}
+	
 	
 	//Register a client account
 	public Client register(Client client) {
 		return clientDAO.createClient(client);
+	}
+	
+	//Run the server
+	public int run() {
+		int errorCode = 0;
+		
+		
+		
+		return errorCode;
 	}
 	
 }

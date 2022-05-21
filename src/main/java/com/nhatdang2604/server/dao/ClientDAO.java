@@ -1,6 +1,5 @@
 package com.nhatdang2604.server.dao;
 
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
