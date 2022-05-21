@@ -1,9 +1,11 @@
 package com.nhatdang2604.server.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.nhatdang2604.server.model.entities.Client;
 import com.nhatdang2604.server.model.entities.Room;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
@@ -19,7 +21,7 @@ public enum RoomDAO {
 
 	
 	//Create a room
-	public Room createRoom(Room room) {
+	public Room create(Room room) {
 		Session session = factory.getCurrentSession();
 		
 		try {
@@ -39,5 +41,28 @@ public enum RoomDAO {
 		return room;
 	}
 	
+	public List<Room> findAll() {
+		
+		Session session = factory.getCurrentSession();
+		
+		List<Room> rooms = new ArrayList<>();
+
+		try {
+			session.beginTransaction();
+			
+			rooms = session.createQuery("from " + Room.class.getName()).list();
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+		
+		return rooms;
+		
+		
+	}
 	
 }
