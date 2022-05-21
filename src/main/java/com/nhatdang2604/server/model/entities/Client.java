@@ -1,13 +1,9 @@
 package com.nhatdang2604.server.model.entities;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.Set;
@@ -26,7 +22,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "Client")
-public class Client implements Serializable, Comparable<Client> {
+public class Client implements ISendable, Serializable, Comparable<Client> {
 
 	//Data in database
 	
@@ -74,6 +70,11 @@ public class Client implements Serializable, Comparable<Client> {
 	}
 
 	//Utilities
+	@Override
+	public int getType() {
+		return ISendable.TYPE_CLIENT;
+	}
+	
 	
 	//Connect to a server with the given ip and port
 	public Client connect(String ip, int port) {

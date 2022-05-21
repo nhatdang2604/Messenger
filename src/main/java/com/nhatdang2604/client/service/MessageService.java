@@ -17,21 +17,21 @@ public enum MessageService {
 		//do nothing
 	}
 
-	//Recieve a package for client
-	public ISendable recieve(Client client) {
-		
-		ISendable pack = null;
-		try {
-			
-			ObjectInputStream reader = client.getReader();
-			pack = (ISendable) reader.readObject();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return pack;
-	}
+//	//Recieve a package for client
+//	public ISendable recieve(Client client) {
+//		
+//		ISendable pack = null;
+//		try {
+//			
+//			ObjectInputStream reader = client.getReader();
+//			pack = (ISendable) reader.readObject();
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return pack;
+//	}
 	
 	//Send a message, and inject the client, room into the message
 	public Message send(Message message, Client client, Room room) {

@@ -34,6 +34,11 @@ public enum ServerService {
 		}
 	}
 
+	public void sendClient(ISendable pack, Socket acceptanceSocket) {
+		//TODO:
+		
+		
+	}
 	
 	public void sendRoom(ISendable pack, Socket acceptanceSocket) {
 		
@@ -79,23 +84,34 @@ public enum ServerService {
 		});
 	}
 	
+	public ISendable recieve(Socket acceptanceSocket) {
+		
+		ISendable pack = null;
+		try {
+			ObjectInputStream reader = new ObjectInputStream(acceptanceSocket.getInputStream());
+			pack = (ISendable) reader.readObject();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return pack;
+	}
+	
 	public void communicate(Socket acceptanceSocket) {
 		while (true) {
 			
 			//Read the package from the client
-			try {
-				ObjectInputStream reader = new ObjectInputStream(acceptanceSocket.getInputStream());
-				ISendable pack = (ISendable) reader.readObject();
-				if (null == pack) {continue;}
-				
-				//Response base on the type of the packge
-				if (ISendable.TYPE_MESSAGE == pack.getType()) {
-					sendMessage(pack, acceptanceSocket);
-				} else if (ISendable.TYPE_ROOM == pack.getType()) {
-					sendRoom(pack, acceptanceSocket);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			ISendable pack = recieve(acceptanceSocket);
+			if (null == pack) {continue;}
+			
+			//Response base on the type of the packge
+			if (ISendable.TYPE_MESSAGE == pack.getType()) {
+				sendMessage(pack, acceptanceSocket);
+			} else if (ISendable.TYPE_ROOM == pack.getType()) {
+				sendRoom(pack, acceptanceSocket);
+			} else if (ISendable.TYPE_CLIENT == pack.getType()) {
+				sendClient(pack, acceptanceSocket);
 			}
 			
 		}
