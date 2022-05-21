@@ -1,4 +1,4 @@
-package com.nhatdang2604.server.service;
+package com.nhatdang2604.client.service;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,29 +8,25 @@ import java.net.Socket;
 import com.nhatdang2604.server.dao.MessageDAO;
 import com.nhatdang2604.server.model.entities.Client;
 import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.model.entities.Room;
 
 public enum MessageService {
 
 	INSTANCE;
 	
-	private MessageDAO messageDAO;
-	
-	
 	private MessageService() {
-		
-		//Inject the session factory from hibernate utility
-		messageDAO = MessageDAO.INSTANCE;
+		//do nothing
 	}
 
 	//Recieve a message from a client
 	public Message recieve(Client client) {
 		
-		Socket socket = client.getSocket();
 		Message message = null;
 		try {
-			ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
-			message = (Message) inStream.readObject();
-
+			
+			ObjectInputStream reader = client.getReader();
+			message = (Message) reader.readObject();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -38,16 +34,17 @@ public enum MessageService {
 		return message;
 	}
 	
-	//Send a message into the database and broadcasting
-	public Message send(Message message) {
+	//Send a message, and inject the client, room into the message
+	public Message send(Message message, Client client, Room room) {
 		
-		Socket socket = message.getClient().getSocket();
+		//Inject attributes for the message
+		message.setClient(client);
+		message.setRoom(room);
 		
 		try {
-			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-			output.writeObject(message);
-		    output.flush();
-		    message = messageDAO.createMessage(message);
+			ObjectOutputStream writer = client.getWriter();
+			writer.writeObject(message);
+		    writer.flush();
 		    
 		} catch (IOException e) {
 			e.printStackTrace();

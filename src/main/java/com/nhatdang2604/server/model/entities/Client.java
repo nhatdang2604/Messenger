@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -62,8 +64,8 @@ public class Client implements Serializable, Comparable<Client> {
 	
 	//Network stuff
 	private Socket socket;
-	private BufferedReader reader;
-	private BufferedWriter writer;
+	private ObjectInputStream reader;
+	private ObjectOutputStream writer;
 	
 	public Client() {
 		socket = null;
@@ -93,8 +95,8 @@ public class Client implements Serializable, Comparable<Client> {
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 			
-			reader = new BufferedReader(new InputStreamReader(is));
-			writer = new BufferedWriter(new OutputStreamWriter(os));
+			reader = new ObjectInputStream(is);
+			writer = new ObjectOutputStream(os);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -156,19 +158,19 @@ public class Client implements Serializable, Comparable<Client> {
 		this.socket = socket;
 	}
 
-	public BufferedReader getReader() {
+	public ObjectInputStream getReader() {
 		return reader;
 	}
 
-	public void setReader(BufferedReader reader) {
+	public void setReader(ObjectInputStream reader) {
 		this.reader = reader;
 	}
 
-	public BufferedWriter getWriter() {
+	public ObjectOutputStream getWriter() {
 		return writer;
 	}
 
-	public void setWriter(BufferedWriter writer) {
+	public void setWriter(ObjectOutputStream writer) {
 		this.writer = writer;
 	}
 	
