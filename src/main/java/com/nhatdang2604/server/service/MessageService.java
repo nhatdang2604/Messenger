@@ -64,7 +64,6 @@ public enum MessageService {
 			message = null;
 		}
        
-		
 		return message;
 	}
 	

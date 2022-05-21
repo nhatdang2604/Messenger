@@ -47,27 +47,9 @@ public enum ClientService {
 		return client;
 	}
 
-	public Message send(Client client, Room room, Message message) {
-		
-		message.setClient(client);
-		message.setRoom(room);
-		
-		return messageService.send(message);
-	}
-	
-	
 	//Register a client account
 	public Client register(Client client) {
 		return clientDAO.createClient(client);
-	}
-	
-	//Run the server
-	public int run() {
-		int errorCode = 0;
-		
-		
-		
-		return errorCode;
 	}
 	
 }
