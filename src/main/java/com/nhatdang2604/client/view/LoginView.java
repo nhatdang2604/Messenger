@@ -21,6 +21,7 @@ public class LoginView extends JFrame {
 	
 	//Components
 	private JButton btnLogin;				//Login button
+	private JButton btnRegistrate;			//Registrate button
 	private JTextField txtUsername;			//Username text field
 	private JPasswordField passtxtPassword;	//Password text field
 	private JLabel jlbUsername;				//Label for username field
@@ -66,7 +67,7 @@ public class LoginView extends JFrame {
 	//Create all components;
 	private void initComponents() {
 		btnLogin = new JButton("Đăng nhập");
-		
+		btnRegistrate = new JButton("Đăng ký");
 		
 		jlbUsername = new JLabel("Tên đăng nhập:");
 		jlbPassword = new JLabel("Mật khẩu:");
@@ -81,17 +82,20 @@ public class LoginView extends JFrame {
 	
 	//Set size and location of each component
 	private void setComponentSizeAndLocation() {
-		btnLogin.setBounds(199,128,100,30);
+		btnLogin.setBounds(144, 128, 100, 30);
+		btnRegistrate.setBounds(249,128,100,30);
+		
 		jlbUsername.setBounds(50,46,100,30);
 	    jlbPassword.setBounds(50,87,100,30);
 	    jlbWarningText.setBounds(130, 11, 190, 30);
-	    txtUsername.setBounds(148,46,150,30);
-	    passtxtPassword.setBounds(148,87,150,30);
-	    chckbxShowPassword.setBounds(83, 132, 110, 23);
+	    txtUsername.setBounds(148,46,200,30);
+	    passtxtPassword.setBounds(148,87,200,30);
+	    chckbxShowPassword.setBounds(35, 132, 110, 23);
 	}
 	
 	//Connect all components into contentPane
 	private void addComponents() {
+		contentPane.add(btnRegistrate);
 		contentPane.add(btnLogin);
 		contentPane.add(jlbUsername);
 		contentPane.add(jlbPassword);
@@ -104,7 +108,7 @@ public class LoginView extends JFrame {
 	//Create and set properties of the login form
 	private void initLoginView() {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(10, 10, 370, 208);
+		this.setBounds(10, 10, 420, 208);
 		this.setTitle("Đăng nhập");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -133,9 +137,8 @@ public class LoginView extends JFrame {
 		return model;
 	}
 	
-	public JButton getSubmitButton() {
-		return btnLogin;
-	}
+	public JButton getLoginButton() {return btnLogin;}
+	public JButton getRegistrateButton() {return btnRegistrate;}
 	
 	public void clear() {
 		txtUsername.setText("");
@@ -143,4 +146,14 @@ public class LoginView extends JFrame {
 		jlbWarningText.setText("");
 	}
 	
+	public static void main(String[] args) {
+		
+		LoginView view = new LoginView();
+		RegistrationView regView = new RegistrationView(view);
+		view.getRegistrateButton().addActionListener(event -> {
+			regView.setVisible(true);
+		});
+		
+		view.setVisible(true);
+	}
 }

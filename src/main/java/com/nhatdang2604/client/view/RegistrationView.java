@@ -6,13 +6,10 @@ import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
-import javax.security.auth.Subject;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,20 +18,16 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.components.TimePicker;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-import com.nhatdang2604.model.entity.Course;
-import com.nhatdang2604.model.entity.Schedule;
-import com.nhatdang2604.model.entity.Student;
-import com.nhatdang2604.model.entity.SubjectWeek;
+import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.utils.HashingUtil;
 
 public class RegistrationView extends JDialog {
 
-	private JPanel headerPanel;
+	private JPanel contentPanel;
 	private JPanel centerPanel;
 	private JPanel footerPanel;
 	
@@ -54,7 +47,7 @@ public class RegistrationView extends JDialog {
 	
 	private static final String[] ERRORS = {
 			"Có ít nhất một ô trống",
-			"Username đã tồn tại",
+			"Tên đăng nhập đã tồn tại",
 			"<html><body>Nhập lại mật khẩu và<br>mật khẩu mới không trùng khớp</body></html>"
 	};
 	
@@ -71,9 +64,14 @@ public class RegistrationView extends JDialog {
 		warningText = new JLabel();					
 		warningText.setForeground(Color.RED);		//Warning have red text
 		
-		headerPanel = new JPanel();
+		contentPanel = new JPanel();
 		centerPanel = new JPanel();
 		footerPanel = new JPanel();
+		
+		usernameField = new JTextField();
+		passwordFields = new ArrayList<>(Arrays.asList(
+				new JPasswordField(),
+				new JPasswordField()));
 		
 		showPasswordCheckbox = new JCheckBox("Hiện mật khẩu");
 		okButton = new JButton("Đăng ký");
@@ -81,7 +79,7 @@ public class RegistrationView extends JDialog {
 		
 		centerPanel = new JPanel();
 		labels = new ArrayList<>(Arrays.asList(
-				new JLabel("Username"),
+				new JLabel("Tên đăng nhập"),
 				new JLabel("Mật khẩu"),
 				new JLabel("Nhập lại mật khẩu")
 		));
@@ -120,15 +118,16 @@ public class RegistrationView extends JDialog {
 	}
 	
 	private void setLayout() {
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPanel.setLayout(new BorderLayout(0, 0));
 		
-		contentPane.add(footerPanel, BorderLayout.SOUTH);
+		contentPanel.add(footerPanel, BorderLayout.SOUTH);
 		footerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		footerPanel.add(showPasswordCheckbox);
 		footerPanel.add(okButton);
 		footerPanel.add(cancelButton);
 		
-		contentPane.add(centerPanel, BorderLayout.CENTER);
+		contentPanel.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.RELATED_GAP_COLSPEC,
 				FormSpecs.DEFAULT_COLSPEC,
@@ -144,122 +143,93 @@ public class RegistrationView extends JDialog {
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				FormSpecs.DEFAULT_ROWSPEC,
 				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
 				FormSpecs.DEFAULT_ROWSPEC,}));
 		
-		centerPanel.add(warningText, "6, 2, center, default");
 		for (int i = 0; i<labels.size(); ++i) {
 			String metaLayout = "4, " + (i+2)*2 + ", right, default";
 			centerPanel.add(labels.get(i), metaLayout);
 		}
 		
-		centerPanel.add(subjectComboBox, "6, 4, fill, default");
-		centerPanel.add(startDatePicker, "6, 6");
-		centerPanel.add(endDatePicker, "6, 8");
-		centerPanel.add(timePicker, "6, 10");
-		centerPanel.add(weekDayComboBox, "6, 12, fill, default");
-		centerPanel.add(weekButton, "6, 14, fill, default");
-		centerPanel.add(addStudentButton, "6, 16, fill, default");
+		centerPanel.add(warningText, "6, 2, center, default");
+		centerPanel.add(usernameField, "6, 4, fill, default");
+		for (int i = 0; i < passwordFields.size(); ++i) {
+			centerPanel.add(passwordFields.get(i), "6, " + (i + 3) * 2 + ", fill, default");
+		}
+		
 	}
 	
 	public void init() {
 		initComponents();
 		setLayout();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 350);
-		setContentPane(contentPane);
+		setBounds(100, 100, 250, 200);
+		setContentPane(contentPanel);
+		setTitle("Đăng ký");
 		
 	}
 	
-	private void initModel() {
-		model = new Course();
-		model.setStudents(new TreeSet<Student>());
-		model.setSubject(new Subject());
-		model.setSchedule(new Schedule());
-		weekForm.setModel(model.getSchedule());
-	}
 	
-	/**
-	 * Create the frame.
-	 */
 	public RegistrationView() {
 		init();
-		initModel();
-	}
-
-	public RegistrationView(Course model, JFrame owner) {
-		super(owner, true);
-		init();
-		setModel(model);
 	}
 	
 	public RegistrationView(JFrame owner) {
 		super(owner, true);
 		init();
-		initModel();
 	}
 	
 	
 	public JButton getOkButton() {return okButton;}
-	public JDialog setModel(Course model) {
-		this.model = model;
-		subjectComboBox.setSelectedItem(model.getSubject());
+	
+	public boolean areThereAnyEmptyField() {
 		
-		Schedule schedule = model.getSchedule();
-		if (null != schedule) {
-			startDatePicker.setDate(schedule.getStartDate());
-			endDatePicker.setDate(schedule.getEndDate());
-			timePicker.setTime(schedule.getTime());
+		String username = usernameField.getText().trim();
+		if (null == username || username.equals("")) {
+			return true;
 		}
 		
-		return this;
+		String emptyStringEncryption = HashingUtil.passwordEncryption("");
+		for (JPasswordField field: passwordFields) {
+			if (null == new String(field.getPassword()).trim()) {
+				return true;
+			}
+			String hashing = HashingUtil.passwordEncryption(new String(field.getPassword()).trim());
+			if (emptyStringEncryption.equals(hashing)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
-	public RegistrationView setAvailableSubjects(List<Subject> subjects) {
-		this.availableSubjects = subjects;
-		subjects.forEach(subject -> {
-			subjectComboBox.addItem(subject);
+	
+	public boolean isPasswordMismatch() {
+		
+		String hash0 = HashingUtil.passwordEncryption(
+				new String(passwordFields.get(0).getPassword()).trim());
+		
+		String hash1 = HashingUtil.passwordEncryption(
+				new String(passwordFields.get(1).getPassword()).trim());
+		
+		return !hash0.equals(hash1);
+	}
+	
+	public Client getModel() {
+		
+		Client client = new Client();
+		client.setUsername(usernameField.getText().trim());
+		String encryptedPassword = HashingUtil.passwordEncryption(
+				new String(passwordFields.get(0).getPassword()).trim());
+		client.setEncryptedPassword(encryptedPassword);
+		client.setIsOnline(false);
+		client.setRooms(new TreeSet<>());
+	
+		return client;
+	}
+	
+	public void clear() {
+		usernameField.setText("");
+		passwordFields.forEach(field -> {
+			field.setText("");
 		});
-		
-		return this;
-	}
-	
-	public Course submit() {
-		
-		model.setSubject((Subject) subjectComboBox.getSelectedItem());
-		Schedule schedule = model.getSchedule();
-		
-		Set<Student> students = addStudentForm.submit();
-		model.setStudents(students);
-		
-		if (null == schedule) {
-			schedule = new Schedule();
-			schedule.setCourse(model);
-			model.setSchedule(schedule);
-			weekForm.setModel(schedule);
-		}
-		
-		schedule.setStartDate(startDatePicker.getDate());
-		schedule.setEndDate(endDatePicker.getDate());
-		schedule.setTime(timePicker.getTime());
-		schedule.setWeekDay((String) weekDayComboBox.getSelectedItem());
-		
-		List<SubjectWeek> weeks = weekForm.submit();
-		schedule.setSubjectWeeks(weeks);
-	
-		return model;
-	}
-	
-	public AddStudentToCourseForm getAddStudentForm() {return addStudentForm;}
-	public ChangeSubjectWeekInCourseForm getWeekForm() {return weekForm;}
-	
-	public JButton getSubmitButton() {
-		return okButton;
 	}
 }

@@ -52,41 +52,48 @@ public class MenuView extends JFrame {
 		
 	}
 	
-	public MenuView(Client owner) {
+	private void init() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
-		
-		this.owner = owner;
 		initComponents();
 		setLayout();
+	}
+	
+	public MenuView(Client owner) {
+		init();
+		this.owner = owner;
 		setRoom(owner.getRooms());
 	}
 	
-	public static void main(String[] args) {
-		Client client = new Client();
-		
-		client.setId(0);
-		
-		Room room = new Room();
-		
-		room.setId(0);
-		room.setName("hihhi");
-		Set<Room> rooms = new TreeSet<>();
-		rooms.add(room);
-		Set<Client> clients = new TreeSet<>();
-		clients.add(client);
-		client.setRooms(rooms);
-		
-		room.setClients(clients);
-		
-		for (Client _client: clients) {
-			_client.setRooms(rooms);
-		}
-		
-		
-		MenuView view = new MenuView(client);
-		view.setVisible(true);
+	public MenuView() {
+		init();
 	}
+	
+//	public static void main(String[] args) {
+//		Client client = new Client();
+//		
+//		client.setId(0);
+//		
+//		Room room = new Room();
+//		
+//		room.setId(0);
+//		room.setName("hihhi");
+//		Set<Room> rooms = new TreeSet<>();
+//		rooms.add(room);
+//		Set<Client> clients = new TreeSet<>();
+//		clients.add(client);
+//		client.setRooms(rooms);
+//		
+//		room.setClients(clients);
+//		
+//		for (Client _client: clients) {
+//			_client.setRooms(rooms);
+//		}
+//		
+//		
+//		MenuView view = new MenuView(client);
+//		view.setVisible(true);
+//	}
 	
 
 	public void setRoom(Set<Room> rooms) {
