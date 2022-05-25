@@ -174,5 +174,14 @@ public class Client implements ISendable, Serializable, Comparable<Client> {
 	public void setWriter(ObjectOutputStream writer) {
 		this.writer = writer;
 	}
+
+	public Set<Room> getRooms() {
+		return rooms;
+	}
+
+	public void setRooms(Set<Room> rooms) {
+		this.rooms = rooms;
+	}
+	
 	
 }
