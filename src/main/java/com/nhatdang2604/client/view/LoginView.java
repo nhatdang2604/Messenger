@@ -99,7 +99,7 @@ public class LoginView extends JFrame {
 		contentPane.add(txtUsername);
 		contentPane.add(passtxtPassword);
 		contentPane.add(chckbxShowPassword);
-	}
+	} 
 	
 	//Create and set properties of the login form
 	private void initLoginView() {

@@ -7,6 +7,7 @@
 	<properties>
 		<hibernate.version>5.6.5.Final</hibernate.version>
 		<mysql.connector.version>5.1.45</mysql.connector.version>
+		<jgoodies-forms.version>1.8.0</jgoodies-forms.version>
 	</properties>
   
   	<dependencies>
@@ -24,6 +25,13 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.connector.version}</version>
 		</dependency>
+		
+		<!-- Support Form Layout -->
+		<dependency>
+    		<groupId>com.jgoodies</groupId>
+    		<artifactId>jgoodies-forms</artifactId>
+    		<version>${jgoodies-forms.version}</version>
+    	</dependency>
 		
 	</dependencies>
   
