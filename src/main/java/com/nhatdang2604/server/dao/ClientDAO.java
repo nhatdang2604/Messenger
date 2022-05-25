@@ -4,7 +4,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.formModel.LoginFormModel;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
 public enum ClientDAO {
@@ -17,7 +16,7 @@ public enum ClientDAO {
 		factory = HibernateUtil.INSTANCE.getSessionFactory();
 	}
 	
-	public Client getUserByUserLoginModel(LoginFormModel model) {
+	public Client getUserByUsername(String username) {
 
 		Session session = factory.getCurrentSession();
 		
@@ -33,7 +32,7 @@ public enum ClientDAO {
 			String query = "from " + Client.class.getName() + " u where u.username = :" + param;
 			
 			client = (Client) session.createQuery(query)
-					.setParameter(param, model.getUsername())
+					.setParameter(param, username)
 					.setMaxResults(1)
 					.stream()
 					.findFirst()
@@ -74,5 +73,24 @@ public enum ClientDAO {
 		return client;
 	}
 	
-	
+	//Create a client account
+	public Client update(Client client) {
+		Session session = factory.getCurrentSession();
+			
+		try {
+			session.beginTransaction();
+				
+			session.update(client);
+				
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+			
+		return client;
+	}
+		
 }

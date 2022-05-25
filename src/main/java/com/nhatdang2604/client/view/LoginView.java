@@ -11,7 +11,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.nhatdang2604.server.model.formModel.LoginFormModel;
+import com.nhatdang2604.server.model.entities.Client;
 import com.nhatdang2604.server.utils.HashingUtil;
 
 public class LoginView extends JFrame {
@@ -32,12 +32,15 @@ public class LoginView extends JFrame {
 	//	1.) Wrong password or username: Type = 0
 	private JLabel jlbWarningText;		
 	
+	public static final int WRONG_ACCOUNT_ERROR = 0;
+	private static final String[] ERRORS = {
+		"Sai mật khẩu hoặc tên đăng nhập"
+	};
+	
 	//Change the warning text of jlbWarningText;
 	public LoginView setError(int errorCode) {
-		
-		//Login form only have warning type = 0: Wrong username or password
-		if (0 == errorCode) {
-			jlbWarningText.setText("Sai mật khẩu hoặc tên đăng nhập");
+		if (0 <= errorCode && errorCode < ERRORS.length) {
+			jlbWarningText.setText(ERRORS[errorCode]);
 		}
 		
 		return this;
@@ -125,16 +128,18 @@ public class LoginView extends JFrame {
 		this.setContentPane(contentPane);
 	}
 
-	public LoginFormModel submit() {
+	public Client submit() {
 		
 		String username = txtUsername.getText().trim();
 		String password = (null == passtxtPassword.getPassword()?
 				HashingUtil.passwordEncryption(""):
 				HashingUtil.passwordEncryption(new String(passtxtPassword.getPassword())));
 		
-		LoginFormModel model = new LoginFormModel(username, password);
+		Client client = new Client();
+		client.setUsername(username);
+		client.setEncryptedPassword(password);
 		
-		return model;
+		return client;
 	}
 	
 	public JButton getLoginButton() {return btnLogin;}

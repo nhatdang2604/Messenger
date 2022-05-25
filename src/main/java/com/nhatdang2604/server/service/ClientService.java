@@ -2,9 +2,6 @@ package com.nhatdang2604.server.service;
 
 import com.nhatdang2604.server.dao.ClientDAO;
 import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.Message;
-import com.nhatdang2604.server.model.entities.Room;
-import com.nhatdang2604.server.model.formModel.LoginFormModel;
 
 public enum ClientService {
 
@@ -20,13 +17,13 @@ public enum ClientService {
 		messageService = MessageService.INSTANCE;
 	}
 	
-	//Helper to compare a model from login form and client
-	public boolean isAuthenticated(LoginFormModel model, Client client) {
+	//Helper to compare a client from login form and client
+	public boolean isAuthenticated(Client givenClient, Client client) {
 		
-		if (null == model || null == client) return false;
+		if (null == givenClient || null == client) return false;
 		
 		//Compare the username
-		boolean isTheSameUsername = client.getUsername().equals(model.getUsername());
+		boolean isTheSameUsername = client.getUsername().equals(givenClient.getUsername());
 			
 		//Return false if the username is different
 		if (!isTheSameUsername) return false;
@@ -34,17 +31,29 @@ public enum ClientService {
 		//Compare the password hashing
 		boolean isTheSamePassword = 
 				client.getEncryptedPassword()
-				.equals(model.getEncryptedPassword());
+				.equals(givenClient.getEncryptedPassword());
 			
 		return isTheSamePassword;
 	}
 
 	//Login by submitting model from the login form
-	public Client login(LoginFormModel model) {
+	public Client login(Client client) {
 		
-		Client client = clientDAO.getUserByUserLoginModel(model);
-		client = (isAuthenticated(model, client)?client:null);
-		return client;
+		//Format data
+		client.setUsername(client.getUsername().trim());
+		client.setEncryptedPassword(client.getEncryptedPassword().trim());
+		
+		//Authenticate
+		Client foundClient = clientDAO.getUserByUsername(client.getUsername());
+		foundClient = (isAuthenticated(client, foundClient)?foundClient:null);
+		
+		//Make the user online, if login sucessfully
+		if (null != foundClient) {
+			foundClient.setIsOnline(true);
+			foundClient = updateClient(foundClient);
+		}
+		
+		return foundClient;
 	}
 
 	//Register a client account
@@ -52,4 +61,8 @@ public enum ClientService {
 		return clientDAO.create(client);
 	}
 	
+	public Client updateClient(Client client) {
+		return clientDAO.update(client);
+	}
 }
+ 

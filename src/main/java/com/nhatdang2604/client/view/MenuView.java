@@ -26,8 +26,7 @@ public class MenuView extends JFrame {
 	private JPanel roomPanel;
 	private JScrollPane scrollPane;
 	
-	private Client owner;
-	private Set<Room> rooms;
+	private Client client;
 	
 	private void initComponents() {
 		createRoomButton = new JButton("Tạo phòng chat");
@@ -59,10 +58,9 @@ public class MenuView extends JFrame {
 		setLayout();
 	}
 	
-	public MenuView(Client owner) {
+	public MenuView(Client client) {
 		init();
-		this.owner = owner;
-		setRoom(owner.getRooms());
+		setClient(client);
 	}
 	
 	public MenuView() {
@@ -95,10 +93,10 @@ public class MenuView extends JFrame {
 //		view.setVisible(true);
 //	}
 	
-
-	public void setRoom(Set<Room> rooms) {
-		this.rooms = rooms;
-		table.setRooms(new ArrayList<Room>(rooms));
+	
+	public void setClient(Client client) {
+		this.client = client;
+		this.table.setRooms(new ArrayList<>(this.client.getRooms()));
 	}
 	
 	public JButton getCreateRoomButton() {return createRoomButton;}
