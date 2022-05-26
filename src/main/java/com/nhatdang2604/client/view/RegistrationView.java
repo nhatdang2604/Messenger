@@ -22,7 +22,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.entities.User;
 import com.nhatdang2604.server.utils.HashingUtil;
 
 public class RegistrationView extends JDialog {
@@ -213,9 +213,9 @@ public class RegistrationView extends JDialog {
 		return !hash0.equals(hash1);
 	}
 	
-	public Client submit() {
+	public User submit() {
 		
-		Client client = new Client();
+		User client = new User();
 		client.setUsername(usernameField.getText().trim());
 		String encryptedPassword = HashingUtil.passwordEncryption(
 				new String(passwordFields.get(0).getPassword()).trim());

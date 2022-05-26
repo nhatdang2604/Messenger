@@ -1,4 +1,4 @@
-package com.nhatdang2604.server.model.entities;
+package com.nhatdang2604.server.entities;
 
 import java.io.Serializable;
 
@@ -13,6 +13,7 @@ public class Packet implements Serializable {
 	public static final int TYPE_POST = 1;
 	public static final int TYPE_CREATE = 2;
 	
+	private User sender;
 	private ISendable sendable;
 	private int sendType;
 	
@@ -34,6 +35,14 @@ public class Packet implements Serializable {
 
 	public void setSendType(int sendType) {
 		this.sendType = sendType;
+	}
+
+	public User getSender() {
+		return sender;
+	}
+
+	public void setSender(User sender) {
+		this.sender = sender;
 	}
 
 	

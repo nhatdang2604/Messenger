@@ -9,8 +9,8 @@ GRANT ALL PRIVILEGES ON `19120469_messenger`.* TO '19120469'@'localhost';
 
 USE `19120469_messenger`;
 
-DROP TABLE IF EXISTS `client`;
-CREATE TABLE `client` (
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(70) NOT NULL,
   `encrypted_password` varchar(70) NOT NULL,
@@ -28,14 +28,14 @@ CREATE TABLE `room` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `client_room`;
-CREATE TABLE `client_room` (
+DROP TABLE IF EXISTS `user_room`;
+CREATE TABLE `user_room` (
   `room_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
 
-  CONSTRAINT `fk_room_client` FOREIGN KEY(`client_id`) REFERENCES client(`id`),
-  CONSTRAINT `fk_client_room` FOREIGN KEY(`room_id`) REFERENCES room(`id`),
-  PRIMARY KEY (room_id, client_id)
+  CONSTRAINT `fk_room_user` FOREIGN KEY(`user_id`) REFERENCES user(`id`),
+  CONSTRAINT `fk_user_room` FOREIGN KEY(`room_id`) REFERENCES room(`id`),
+  PRIMARY KEY (room_id, user_id)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `message`;
@@ -44,10 +44,10 @@ CREATE TABLE `message` (
   `content` nvarchar(1024) DEFAULT NULL,
   `data_type` int(2) NOT NULL,
   `date_time` DATETIME NOT NULL,
-   `client_id` int(11) NOT NULL,
+   `user_id` int(11) NOT NULL,
    `room_id` int(11) NOT NULL,
 
-  CONSTRAINT `fk_message_client` FOREIGN KEY(`client_id`) REFERENCES client(`id`),
+  CONSTRAINT `fk_message_user` FOREIGN KEY(`user_id`) REFERENCES user(`id`),
   CONSTRAINT `fk_message_room` FOREIGN KEY(`room_id`) REFERENCES room(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;

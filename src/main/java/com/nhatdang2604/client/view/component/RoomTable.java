@@ -9,8 +9,8 @@ import javax.swing.table.TableColumn;
 
 import com.nhatdang2604.client.view.component.widget.ButtonEditor;
 import com.nhatdang2604.client.view.component.widget.ButtonRenderer;
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 
 public class RoomTable extends JTable {
 
@@ -105,8 +105,8 @@ public class RoomTable extends JTable {
 			//Count the number of online user in a room
 			int onlineCount = 0;
 			
-			if(null != room.getClients()) {
-				for (Client client: room.getClients()) {
+			if(null != room.getUsers()) {
+				for (User client: room.getUsers()) {
 					if (null != client.getIsOnline() && client.getIsOnline()) {
 						++onlineCount;
 					}

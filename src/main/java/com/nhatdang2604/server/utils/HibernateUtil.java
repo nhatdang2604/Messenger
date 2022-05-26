@@ -3,9 +3,9 @@ package com.nhatdang2604.server.utils;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.Message;
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 
 //Using enum to implement singleton pattern, for thread safe
 public enum HibernateUtil {
@@ -31,7 +31,7 @@ public enum HibernateUtil {
 			sessionFactory = new Configuration()
 					.configure(hibernateConfigFile)
 					.addAnnotatedClass(Room.class)
-					.addAnnotatedClass(Client.class)
+					.addAnnotatedClass(User.class)
 					.addAnnotatedClass(Message.class)
 					.buildSessionFactory();
 			

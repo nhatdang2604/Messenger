@@ -11,7 +11,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.entities.User;
 import com.nhatdang2604.server.utils.HashingUtil;
 
 public class LoginView extends JFrame {
@@ -128,14 +128,14 @@ public class LoginView extends JFrame {
 		this.setContentPane(contentPane);
 	}
 
-	public Client submit() {
+	public User submit() {
 		
 		String username = txtUsername.getText().trim();
 		String password = (null == passtxtPassword.getPassword()?
 				HashingUtil.passwordEncryption(""):
 				HashingUtil.passwordEncryption(new String(passtxtPassword.getPassword())));
 		
-		Client client = new Client();
+		User client = new User();
 		client.setUsername(username);
 		client.setEncryptedPassword(password);
 		

@@ -1,26 +1,27 @@
 package com.nhatdang2604.server.dao;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.nhatdang2604.server.model.entities.Client;
+import com.nhatdang2604.server.entities.User;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
-public enum ClientDAO {
+public enum UserDAO {
 	
 	INSTANCE;
 	
 	private SessionFactory factory;
 	
-	private ClientDAO() {
+	private UserDAO() {
 		factory = HibernateUtil.INSTANCE.getSessionFactory();
 	}
 	
-	public Client getUserByUsername(String username) {
+	public User getUserByUsername(String username) {
 
 		Session session = factory.getCurrentSession();
 		
-		Client client = null;
+		User user = null;
 		
 		try {
 			session.beginTransaction();
@@ -29,18 +30,19 @@ public enum ClientDAO {
 			String param = "username";
 			
 			//Make the query
-			String query = "from " + Client.class.getName() + " u where u.username = :" + param;
+			String query = "from " + User.class.getName() + " u where u.username = :" + param;
 			
-			client = (Client) session.createQuery(query)
+			user = (User) session.createQuery(query)
 					.setParameter(param, username)
 					.setMaxResults(1)
 					.stream()
 					.findFirst()
 					.orElse(null);
 			
-//			if (null != client) {
-//				Hibernate.initialize(Client.getUserInformation());
-//			}
+			if (null != user) {
+				Hibernate.initialize(user.getRooms());
+			}
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			session.getTransaction().rollback();
@@ -49,18 +51,18 @@ public enum ClientDAO {
 			session.close();
 		}
 		
-		return client;
+		return user;
 	}
 	
 	//Create a client account
-	public Client create(Client client) {
+	public User create(User client) {
 		Session session = factory.getCurrentSession();
 		
 		try {
 			session.beginTransaction();
 			
 			Integer id = (Integer) session.save(client);
-			client = session.get(Client.class, id);
+			client = session.get(User.class, id);
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -74,7 +76,7 @@ public enum ClientDAO {
 	}
 	
 	//Create a client account
-	public Client update(Client client) {
+	public User update(User client) {
 		Session session = factory.getCurrentSession();
 			
 		try {
@@ -93,15 +95,15 @@ public enum ClientDAO {
 		return client;
 	}
 
-	public Client find(Integer id) {
+	public User find(Integer id) {
 		
 		Session session = factory.getCurrentSession();
-		Client client = null;
+		User client = null;
 		
 		try {
 			session.beginTransaction();
 				
-			client = session.get(Client.class, id);
+			client = session.get(User.class, id);
 				
 		} catch (Exception ex) {
 			ex.printStackTrace();

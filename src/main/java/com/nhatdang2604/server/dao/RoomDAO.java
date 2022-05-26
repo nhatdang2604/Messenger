@@ -6,7 +6,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
 public enum RoomDAO {

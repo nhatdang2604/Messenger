@@ -6,9 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import com.nhatdang2604.server.dao.MessageDAO;
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.ISendable;
-import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.entities.ISendable;
+import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.User;
 
 public enum MessageService {
 

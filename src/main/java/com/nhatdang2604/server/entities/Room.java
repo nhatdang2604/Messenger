@@ -1,4 +1,4 @@
-package com.nhatdang2604.server.model.entities;
+package com.nhatdang2604.server.entities;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -45,10 +45,10 @@ public class Room implements ISendable, Serializable, Comparable<Room> {
 					CascadeType.REFRESH},
 			fetch = FetchType.EAGER)
 	@JoinTable(
-			name = "client_room",
+			name = "user_room",
 			joinColumns = @JoinColumn(name = "room_id"),
-			inverseJoinColumns = @JoinColumn(name = "client_id"))
-	private Set<Client> clients;
+			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<User> users;
 	
 	@OneToMany(
 			cascade = CascadeType.ALL,
@@ -84,12 +84,12 @@ public class Room implements ISendable, Serializable, Comparable<Room> {
 		this.name = name;
 	}
 
-	public Set<Client> getClients() {
-		return clients;
+	public Set<User> getUsers() {
+		return users;
 	}
 
-	public void setClients(Set<Client> clients) {
-		this.clients = clients;
+	public void setUsers(Set<User> users) {
+		this.users = users;
 	}
 		
 	

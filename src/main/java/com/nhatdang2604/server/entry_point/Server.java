@@ -20,7 +20,9 @@ public class Server {
 		
 		if (buffer.toLowerCase().equals("y")) {
 			service.stop();
+			System.out.println("Server is stopped");
 		}
+		
 		
 	}
 	

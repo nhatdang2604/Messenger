@@ -1,11 +1,6 @@
-package com.nhatdang2604.server.model.entities;
+package com.nhatdang2604.server.entities;
 
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.Socket;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -19,11 +14,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
-@Table(name = "client")
-public class Client implements ISendable, Serializable, Comparable<Client> {
+@Table(name = "user")
+public class User implements ISendable, Serializable, Comparable<User> {
 
 	//Data in database
 	
@@ -54,68 +48,23 @@ public class Client implements ISendable, Serializable, Comparable<Client> {
 					CascadeType.REFRESH},
 			fetch = FetchType.EAGER)
 	@JoinTable(
-			name = "client_room",
-			joinColumns = @JoinColumn(name = "client_id"),
+			name = "user_room",
+			joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "room_id"))
 	private Set<Room> rooms;
 	
-	//Network stuff
-	@Transient
-	private Socket socket;
-	
-	@Transient
-	private ObjectInputStream reader;
-	
-	@Transient
-	private ObjectOutputStream writer;
-	
-	public Client() {
-		socket = null;
-		reader = null;
-		writer = null;
-		
+	public User() {
+		//do nothing
 	}
 
 	//Utilities
 	@Override
 	public int getType() {
-		return ISendable.TYPE_CLIENT;
+		return ISendable.TYPE_USER;
 	}
-	
-	
-	//Connect to a server with the given ip and port
-	public Client connect(String ip, int port) {
-		
-		try {
-			
-			//Force the socket to close if the socket was opened
-			if (null != socket) {
-				if (socket.isConnected()) {
-					socket.close();
-					if (null != reader) {reader.close();}
-					if (null != writer) {writer.close();}
-				}
-			}
-			
-			//Open the socket	
-			socket = new Socket(ip, port);
-			
-			InputStream is = socket.getInputStream();
-			OutputStream os = socket.getOutputStream();
-			
-			reader = new ObjectInputStream(is);
-			writer = new ObjectOutputStream(os);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return this;
-	}
-	
 	
 	//Compare for using Set, by implementing Comparable
-	public int compareTo(Client another) {
+	public int compareTo(User another) {
 		if (null == another) return 1;
 				
 		int result = 
@@ -158,36 +107,42 @@ public class Client implements ISendable, Serializable, Comparable<Client> {
 		this.isOnline = isOnline;
 	}
 
-	public Socket getSocket() {
-		return socket;
-	}
-
-	public void setSocket(Socket socket) {
-		this.socket = socket;
-	}
-
-	public ObjectInputStream getReader() {
-		return reader;
-	}
-
-	public void setReader(ObjectInputStream reader) {
-		this.reader = reader;
-	}
-
-	public ObjectOutputStream getWriter() {
-		return writer;
-	}
-
-	public void setWriter(ObjectOutputStream writer) {
-		this.writer = writer;
-	}
-
 	public Set<Room> getRooms() {
 		return rooms;
 	}
 
 	public void setRooms(Set<Room> rooms) {
 		this.rooms = rooms;
+	}
+
+	@Override
+	public String toString() {
+		return "Client [username=" + username + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 	
 	

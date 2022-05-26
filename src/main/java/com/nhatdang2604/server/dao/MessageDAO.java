@@ -3,7 +3,7 @@ package com.nhatdang2604.server.dao;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
 public enum MessageDAO {

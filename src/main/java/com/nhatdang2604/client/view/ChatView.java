@@ -15,8 +15,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.User;
 
 public class ChatView extends JFrame {
 
@@ -30,7 +30,7 @@ public class ChatView extends JFrame {
 	private JPanel messagePanel;
 	private JScrollPane scrollPane;
 	
-	private Client owner;
+	private User owner;
 	
 	private void initComponents() {
 		sendButton = new JButton("Gửi");
@@ -67,7 +67,7 @@ public class ChatView extends JFrame {
 		
 	}
 	
-	public ChatView(Client owner) {
+	public ChatView(User owner) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		
@@ -116,7 +116,7 @@ public class ChatView extends JFrame {
 	
 	public void addNewMessage(Message message) {
 		
-		Client client = message.getClient();
+		User client = message.getUser();
 		
 		Color nameColor = Color.BLUE;
 		Color dateColor = Color.GRAY;

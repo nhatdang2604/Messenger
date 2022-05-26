@@ -1,4 +1,4 @@
-package com.nhatdang2604.server.model.entities;
+package com.nhatdang2604.server.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -43,10 +43,10 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 					CascadeType.REFRESH},
 			fetch = FetchType.EAGER)
 	@JoinColumn(
-			name = "client_id", 
+			name = "user_id", 
 			referencedColumnName = "id",
 			nullable = true)
-	private Client client;
+	private User user;
 	
 	@ManyToOne(
 			cascade = {
@@ -95,12 +95,12 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 		this.id = id;
 	}
 
-	public Client getClient() {
-		return client;
+	public User getUser() {
+		return user;
 	}
 
-	public void setClient(Client client) {
-		this.client = client;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Room getRoom() {

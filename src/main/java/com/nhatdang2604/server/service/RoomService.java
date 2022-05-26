@@ -7,10 +7,10 @@ import java.net.Socket;
 import java.util.List;
 
 import com.nhatdang2604.server.dao.RoomDAO;
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.ISendable;
-import com.nhatdang2604.server.model.entities.Message;
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.ISendable;
+import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 
 public enum RoomService {
 

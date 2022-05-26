@@ -1,13 +1,12 @@
 package com.nhatdang2604.client.service;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.ISendable;
-import com.nhatdang2604.server.model.entities.Message;
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 
 public enum MessageService {
 
@@ -16,32 +15,16 @@ public enum MessageService {
 	private MessageService() {
 		//do nothing
 	}
-
-//	//Recieve a package for client
-//	public ISendable recieve(Client client) {
-//		
-//		ISendable pack = null;
-//		try {
-//			
-//			ObjectInputStream reader = client.getReader();
-//			pack = (ISendable) reader.readObject();
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return pack;
-//	}
 	
 	//Send a message, and inject the client, room into the message
-	public Message send(Message message, Client client, Room room) {
+	public Message send(Message message, User user, Room room, Socket socket) {
 		
 		//Inject attributes for the message
-		message.setClient(client);
+		message.setUser(user);
 		message.setRoom(room);
 		
 		try {
-			ObjectOutputStream writer = client.getWriter();
+			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 			writer.writeObject(message);
 		    writer.flush();
 		    

@@ -8,7 +8,7 @@ public enum Configuration {
 	private String ip;
 	
 	private Configuration() {
-		port = 3200;
+		port = 8888;
 		ip = "localhost";
 	}
 	

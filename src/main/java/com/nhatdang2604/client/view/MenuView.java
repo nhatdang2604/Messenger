@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import com.nhatdang2604.client.view.component.RoomTable;
-import com.nhatdang2604.server.model.entities.Client;
-import com.nhatdang2604.server.model.entities.Room;
+import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 
 public class MenuView extends JFrame {
 
@@ -26,7 +26,7 @@ public class MenuView extends JFrame {
 	private JPanel roomPanel;
 	private JScrollPane scrollPane;
 	
-	private Client client;
+	private User client;
 	
 	private void initComponents() {
 		createRoomButton = new JButton("Tạo phòng chat");
@@ -58,7 +58,7 @@ public class MenuView extends JFrame {
 		setLayout();
 	}
 	
-	public MenuView(Client client) {
+	public MenuView(User client) {
 		init();
 		setClient(client);
 	}
@@ -94,7 +94,7 @@ public class MenuView extends JFrame {
 //	}
 	
 	
-	public void setClient(Client client) {
+	public void setClient(User client) {
 		this.client = client;
 		this.table.setRooms(new ArrayList<>(this.client.getRooms()));
 	}
