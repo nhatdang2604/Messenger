@@ -203,15 +203,23 @@ public enum ServerService {
 			try {
 				final Socket acceptanceSocket = socket.accept();
 				if (null == acceptanceSocket) {continue;}
+				System.out.println(acceptanceSocket + " join the server");
 				Thread thread = new Thread(() -> {communicate(acceptanceSocket);});
 				thread.start();
 			
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			
 		}
 	
 	}
-	
+
+	public void stop() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -213,7 +213,7 @@ public class RegistrationView extends JDialog {
 		return !hash0.equals(hash1);
 	}
 	
-	public Client getModel() {
+	public Client submit() {
 		
 		Client client = new Client();
 		client.setUsername(usernameField.getText().trim());

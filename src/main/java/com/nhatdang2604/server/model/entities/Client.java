@@ -19,9 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
-@Table(name = "Client")
+@Table(name = "client")
 public class Client implements ISendable, Serializable, Comparable<Client> {
 
 	//Data in database
@@ -59,14 +60,20 @@ public class Client implements ISendable, Serializable, Comparable<Client> {
 	private Set<Room> rooms;
 	
 	//Network stuff
+	@Transient
 	private Socket socket;
+	
+	@Transient
 	private ObjectInputStream reader;
+	
+	@Transient
 	private ObjectOutputStream writer;
 	
 	public Client() {
 		socket = null;
 		reader = null;
 		writer = null;
+		
 	}
 
 	//Utilities

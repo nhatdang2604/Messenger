@@ -1,4 +1,4 @@
-Create the database
+#Create the database
 DROP DATABASE IF EXISTS `19120469_messenger`;
 CREATE DATABASE `19120469_messenger`;
 
