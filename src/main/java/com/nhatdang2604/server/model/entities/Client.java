@@ -30,7 +30,7 @@ public class Client implements ISendable, Serializable, Comparable<Client> {
 	 * 
 	 */
 	private static final long serialVersionUID = -937046062405840229L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")

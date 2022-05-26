@@ -45,21 +45,5 @@ public enum MessageService {
 	public Message createMessage(Message message) {
 		return messageDAO.create(message);
 	}
-	
-	//Send a message to a client
-	public Message send(Message message, Client client) {
-		
-		try {
-			ObjectOutputStream writer = client.getWriter();
-			writer.writeObject(message);
-			writer.flush();
-		    
-		} catch (IOException e) {
-			e.printStackTrace();
-			message = null;
-		}
-       
-		return message;
-	}
 
 }

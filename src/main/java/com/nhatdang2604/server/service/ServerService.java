@@ -2,6 +2,7 @@ package com.nhatdang2604.server.service;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Set;
@@ -10,6 +11,7 @@ import com.nhatdang2604.config.Configuration;
 import com.nhatdang2604.server.model.entities.Client;
 import com.nhatdang2604.server.model.entities.ISendable;
 import com.nhatdang2604.server.model.entities.Message;
+import com.nhatdang2604.server.model.entities.Packet;
 import com.nhatdang2604.server.model.entities.Room;
 
 public enum ServerService {
@@ -20,11 +22,13 @@ public enum ServerService {
 	private ServerSocket socket;
 	private MessageService messageService;
 	private RoomService roomService;
+	private ClientService clientService;
 	
 	private ServerService() {
 		configuration = Configuration.INSTANCE;
 		messageService = MessageService.INSTANCE;
 		roomService = RoomService.INSTANCE;
+		clientService = ClientService.INSTANCE;
 		
 		//Try to create the socket via the port from configuration
 		try {
@@ -34,16 +38,39 @@ public enum ServerService {
 		}
 	}
 
-	public void sendClient(ISendable pack, Socket acceptanceSocket) {
-		//TODO:
+	public void authenticateClient(Packet packet, Socket acceptanceSocket) {
 		
+		Client sentClient = (Client) packet.getSendable();
+		Client client = null;
+		
+		if (null != sentClient) {
+			client = clientService.login(sentClient);
+		}
+		
+		//Using the socket from the sent client to IO
+		send(client, sentClient);
 		
 	}
 	
-	public void sendRoom(ISendable pack, Socket acceptanceSocket) {
+	public void registrateClient(Packet packet, Socket acceptanceSocket) {
+		
+		
+		Client sentClient = (Client) packet.getSendable();
+		Client client = null;
+		
+		if (null != sentClient) {
+			client = clientService.registrate(sentClient);
+		}
+		
+		//Using the socket from the client to IO
+		send(client, sentClient);
+	
+	}
+	
+	public void openRoom(Packet packet, Socket acceptanceSocket) {
 		
 		//Send the room, if the client open an existed room
-		Room room = (Room) pack;
+		Room room = (Room) packet.getSendable();
 		room = roomService.findRoomById(room.getId());
 		
 		if (null != room) {
@@ -58,16 +85,39 @@ public enum ServerService {
 			//If the client is in the selected room => send the room to the client
 			if (null != client) 
 			{
-				roomService.send(room, client);
+				send(room, client);
 			}
 		}
 		
 	}
 	
-	public void sendMessage(ISendable pack, Socket acceptanceSocket) {
+	public void createRoom(Packet packet, Socket acceptanceSocket) {
+		
+		Room room = (Room) packet.getSendable();
+		Client client = null;
+		
+		if (null != room) {
+			
+			
+			
+			//Find the client of the acceptanceSocket, if not found => return null
+			//	The first client always the first member of the creating room
+			client = room.getClients().stream().findFirst().orElse(null);
+			
+			room = roomService.createRoom(room);
+			client = clientService.findClientById(client.getId());
+			
+		}
+		
+		//Send the created room to the client
+		send(room, client);
+		
+	}
+	
+	public void sendMessage(Packet packet, Socket acceptanceSocket) {
 
 		//Send the message, if the client is messenging
-		Message message = (Message) pack;
+		Message message = (Message) packet.getSendable();
 		
 		//Save the message to database
 		messageService.createMessage(message);
@@ -78,40 +128,70 @@ public enum ServerService {
 		//Send message to all the clients in the room, except the sender
 		clients.forEach(client -> {
 			if(!client.getSocket().equals(acceptanceSocket)) {
-				messageService.send(message, client);
+				send(message, client);
 			}
 			
 		});
 	}
 	
-	public ISendable recieve(Socket acceptanceSocket) {
+	public Packet recieve(Socket acceptanceSocket) {
 		
-		ISendable pack = null;
+		Packet packet = null;
 		try {
 			ObjectInputStream reader = new ObjectInputStream(acceptanceSocket.getInputStream());
-			pack = (ISendable) reader.readObject();
+			packet = (Packet) reader.readObject();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return pack;
+		return packet;
+	}
+	
+	public ISendable send(ISendable sendable, Client client) { 
+		try {
+			ObjectOutputStream writer = client.getWriter();
+			writer.writeObject(sendable);
+			writer.flush();
+			    
+		} catch (IOException e) {
+			e.printStackTrace();
+			sendable = null;
+		}
+	       
+		return sendable;
 	}
 	
 	public void communicate(Socket acceptanceSocket) {
 		while (true) {
 			
 			//Read the package from the client
-			ISendable pack = recieve(acceptanceSocket);
-			if (null == pack) {continue;}
+			Packet packet = recieve(acceptanceSocket);
+			if (null == packet) {continue;}
 			
 			//Response base on the type of the packge
-			if (ISendable.TYPE_MESSAGE == pack.getType()) {
-				sendMessage(pack, acceptanceSocket);
-			} else if (ISendable.TYPE_ROOM == pack.getType()) {
-				sendRoom(pack, acceptanceSocket);
-			} else if (ISendable.TYPE_CLIENT == pack.getType()) {
-				sendClient(pack, acceptanceSocket);
+			if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
+				
+				if (Packet.TYPE_POST == packet.getSendType()) {
+					sendMessage(packet, acceptanceSocket);
+				}
+				
+			} else if (ISendable.TYPE_ROOM == packet.getSendable().getType()) {
+				
+				if (Packet.TYPE_GET == packet.getSendType()) {
+					openRoom(packet, acceptanceSocket);
+				} else if (Packet.TYPE_CREATE == packet.getSendType()) {
+					createRoom(packet, acceptanceSocket);
+				}
+				
+			} else if (ISendable.TYPE_CLIENT == packet.getSendable().getType()) {
+				
+				//Authenticate
+				if (Packet.TYPE_POST == packet.getSendType()) {
+					authenticateClient(packet, acceptanceSocket);
+				} else if (Packet.TYPE_CREATE == packet.getSendType()) {
+					registrateClient(packet, acceptanceSocket);
+				}
 			}
 			
 		}

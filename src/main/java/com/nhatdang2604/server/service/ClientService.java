@@ -44,7 +44,7 @@ public enum ClientService {
 		client.setEncryptedPassword(client.getEncryptedPassword().trim());
 		
 		//Authenticate
-		Client foundClient = clientDAO.getUserByUsername(client.getUsername());
+		Client foundClient = getUserByUsername(client.getUsername());
 		foundClient = (isAuthenticated(client, foundClient)?foundClient:null);
 		
 		//Make the user online, if login sucessfully
@@ -56,13 +56,33 @@ public enum ClientService {
 		return foundClient;
 	}
 
+	public Client getUserByUsername(String username) {
+		return clientDAO.getUserByUsername(username);
+	}
+	
 	//Register a client account
-	public Client register(Client client) {
-		return clientDAO.create(client);
+	public Client registrate(Client client) {
+		
+		Client foundClient = getUserByUsername(client.getUsername());
+		
+		//There are no user have the same username
+		if (null == foundClient) {
+			client = clientDAO.create(client);
+		} else {
+			
+			//Else
+			client = null;
+		}
+		
+		return client;
 	}
 	
 	public Client updateClient(Client client) {
 		return clientDAO.update(client);
+	}
+	
+	public Client findClientById(Integer id) {
+		return clientDAO.find(id);
 	}
 }
  

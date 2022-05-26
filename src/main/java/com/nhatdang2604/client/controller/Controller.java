@@ -61,10 +61,13 @@ public class Controller {
 				menuView.setVisible(true);
 			}
 			
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			
+			//Clear field in login form
+			loginView.clear();
 		}
 	}
 	

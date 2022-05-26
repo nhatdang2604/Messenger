@@ -53,20 +53,5 @@ public enum RoomService {
 			
 		return room;
 	}
-		
-	//Send a room to a client
-	public Room send(Room room, Client client) {
-			
-		try {
-			ObjectOutputStream writer = client.getWriter();
-			writer.writeObject(room);
-			writer.flush();
-			    
-		} catch (IOException e) {
-			e.printStackTrace();
-			room = null;
-		}
-	       
-		return room;
-	}
+	
 }

@@ -92,5 +92,28 @@ public enum ClientDAO {
 			
 		return client;
 	}
+
+	public Client find(Integer id) {
+		
+		Session session = factory.getCurrentSession();
+		Client client = null;
+		
+		try {
+			session.beginTransaction();
+				
+			client = session.get(Client.class, id);
+				
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+			
+		return client;
+		
+		
+	}
 		
 }
