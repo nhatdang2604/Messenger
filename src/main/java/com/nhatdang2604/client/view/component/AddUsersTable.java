@@ -1,5 +1,6 @@
 package com.nhatdang2604.client.view.component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -63,7 +64,8 @@ public class AddUsersTable extends JTable {
 
 	public AddUsersTable() {		
 		setupModelTable();
-	
+		setTotalUsers(new ArrayList<>());
+		setChosenUsers(new TreeSet<>());
 	}
 	
 	public AddUsersTable clearData() {
@@ -130,6 +132,7 @@ public class AddUsersTable extends JTable {
 	}
 	
 	public AddUsersTable clear() {
+	
 		int size = totalUsers.size();
 		for (int i = 0; i < size; ++i) {
 			tableModel.setValueAt(new Boolean(false), i, SELECT_COLUMN_INDEX);
