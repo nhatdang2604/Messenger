@@ -91,6 +91,14 @@ public class Room implements ISendable, Serializable, Comparable<Room> {
 	public void setUsers(Set<User> users) {
 		this.users = users;
 	}
+
+	public Set<Message> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(Set<Message> messages) {
+		this.messages = messages;
+	}
 		
 	
 }
