@@ -19,6 +19,9 @@ public class Controller {
 	//Configuration
 	private Configuration config;
 	
+	//Flag
+	private boolean isClose;
+	
 	//Views
 	private LoginView loginView;
 	private RegistrationView registrationView;
@@ -30,31 +33,24 @@ public class Controller {
 	
 	//Network stuffs
 	private Socket socket;
+	private Thread listenerThread;
 	private ObjectOutputStream writer;
 	private ObjectInputStream reader;
 	
+	private void initListener() {
+		this.listenerThread = new Thread(() -> {
+			
+			//Run until the client app is closed
+			while(!isClose) {
+				
+			}
+			
+		});
+	}
+	
 	private void initNetwork(Socket socket) {
 		this.socket = socket;
-		try {
-//			System.out.println("Writer");
-//			writer = new ObjectOutputStream(this.socket.getOutputStream());
-//			this.socket.getOutputStream().flush();
-//			writer.flush();
-//			System.out.println("Reader");
-//			
-//			reader = new ObjectInputStream(this.socket.getInputStream());
-//			//Read the handshake message
-//			try {
-//				Message message = (Message) reader.readObject();
-//				System.out.println("Connected");
-//			} catch (ClassNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//			System.out.println("End reader");
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public Controller(Socket socket) {
@@ -63,9 +59,10 @@ public class Controller {
 		registrationView = new RegistrationView(loginView);
 		menuView = new MenuView();
 		createRoomView = new CreateRoomView(menuView);
-		
+		isClose = false;
 		user = null;
 		initNetwork(socket);
+		initListener();
 	}
 
 	public void run() {
@@ -178,6 +175,9 @@ public class Controller {
 		} else {
 			user = foundUser;
 			menuView.setClient(user);
+			
+			//Start the listener thread (after login sucessfully)
+			listenerThread.start();
 		}
 		
 		createRoomView.setVisible(false);
