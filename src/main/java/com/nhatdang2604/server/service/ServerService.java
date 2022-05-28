@@ -140,9 +140,6 @@ public enum ServerService {
 		for (User member: members) {
 			if (connectedUsers.containsKey(member.getId())) {
 				
-				System.out.println("YESSSSSSS");
-				System.out.println(member.getRooms().size());
-				
 				List<Socket> sockets = connectedUsers.get(member.getId());
 				for (Socket soc: sockets) {
 					send(member, soc);
