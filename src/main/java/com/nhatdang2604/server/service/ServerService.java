@@ -29,7 +29,7 @@ public enum ServerService {
 	//Network stuffs
 	private ServerSocket serverSocket;
 	private Collection<Socket> connectedSockets;
-	private Map<User, List<Socket>> connectedUsers;
+	private Map<Integer, List<Socket>> connectedUsers;	//Integer is id of the user
 	
 	//Configs
 	private Configuration configuration;
@@ -68,8 +68,7 @@ public enum ServerService {
 		if (null != sentUser) {
 			
 			//Make a copy identify for user
-			User key = new User();
-			key.setId(sentUser.getId());		
+			Integer key = sentUser.getId();		
 			
 			if (!connectedUsers.containsKey(key)) {
 				
@@ -133,14 +132,18 @@ public enum ServerService {
 		
 		if (null != room) {
 			room = roomService.createRoom(room);
+			room = roomService.findRoomById(room.getId());
 		}
 		
 		//Send the current user state to all the members who are online
 		Set<User> members = room.getUsers();
 		for (User member: members) {
-			if (connectedUsers.containsKey(member)) {
+			if (connectedUsers.containsKey(member.getId())) {
 				
-				List<Socket> sockets = connectedUsers.get(member);
+				System.out.println("YESSSSSSS");
+				System.out.println(member.getRooms().size());
+				
+				List<Socket> sockets = connectedUsers.get(member.getId());
 				for (Socket soc: sockets) {
 					send(member, soc);
 				}

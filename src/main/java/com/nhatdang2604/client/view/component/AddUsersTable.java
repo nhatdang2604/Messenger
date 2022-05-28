@@ -145,4 +145,8 @@ public class AddUsersTable extends JTable {
 		this.chosenUsers = users;
 		return this;
 	}
+	
+	public Set<User> getChosenUsers() {
+		return chosenUsers;
+	}
 }

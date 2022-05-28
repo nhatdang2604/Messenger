@@ -3,10 +3,12 @@ package com.nhatdang2604.server.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.nhatdang2604.server.entities.Room;
+import com.nhatdang2604.server.entities.User;
 import com.nhatdang2604.server.utils.HibernateUtil;
 
 public enum RoomDAO {
@@ -72,6 +74,10 @@ public enum RoomDAO {
 		try {
 			session.beginTransaction();
 			room = session.get(Room.class, id);
+			
+			for (User user: room.getUsers()) {
+				Hibernate.initialize(user);
+			}	
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -94,11 +94,16 @@ public class Controller {
 		loginView.getLoginButton().addActionListener(event -> {
 			loginProcess();
 		});
+		
+		createRoomView.getOkButton().addActionListener(event -> {
+			createRoomProcess();
+		});
 	}
 	
 	private void gotoCreateRoom() {
 		menuView.getCreateRoomButton().addActionListener(event -> {
-			createRoomProcess();
+			createRoomView.clear();
+			createRoomView.setVisible(true);
 		});
 		
 		gotoAddUser();
@@ -140,8 +145,6 @@ public class Controller {
 	}
 	
 	private void createRoomProcess() {
-		createRoomView.clear();
-		createRoomView.setVisible(true);
 		
 		//Validate the form first
 		if (createRoomView.areThereAnyEmptyField()) {
@@ -168,12 +171,16 @@ public class Controller {
 		//Recieved the current user from the server
 		User foundUser = (User) recieved();
 		
+		System.out.println(foundUser.getRooms().size());
+		
 		if (null == foundUser) {
 			//Some error happend
 		} else {
 			user = foundUser;
 			menuView.setClient(user);
 		}
+		
+		createRoomView.setVisible(false);
 	}
 	
 	private void registrateProcess() {
@@ -262,6 +269,7 @@ public class Controller {
 				this.user = foundUser;
 				menuView.setClient(foundUser);
 				menuView.setVisible(true);
+				loginView.setVisible(false);
 			}
 			
 		} catch (Exception e) {

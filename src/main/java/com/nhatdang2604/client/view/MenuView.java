@@ -97,6 +97,7 @@ public class MenuView extends JFrame {
 	public void setClient(User client) {
 		this.client = client;
 		this.table.setRooms(new ArrayList<>(this.client.getRooms()));
+		this.table.update();
 	}
 	
 	public JButton getCreateRoomButton() {return createRoomButton;}

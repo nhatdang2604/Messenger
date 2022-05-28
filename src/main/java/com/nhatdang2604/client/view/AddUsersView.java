@@ -26,6 +26,16 @@ public class AddUsersView extends JDialog {
 	
 	private List<User> users;
 	
+	private void initButtons() {
+		cancelButton.addActionListener((event)->{
+			this.dispose();
+		});
+		
+		okButton.addActionListener(event -> {
+			this.setVisible(false);
+		});
+	} 
+	
 	private void initComponents() {
 		
 		contentPane = new JPanel();
@@ -35,10 +45,7 @@ public class AddUsersView extends JDialog {
 		table = new AddUsersTable();
 		scrollPane = new JScrollPane(table);
 		
-		//Setup for cancel button
-		cancelButton.addActionListener((event)->{
-			this.dispose();
-		});
+		initButtons();
 	}
 	
 	private void setLayout() {
