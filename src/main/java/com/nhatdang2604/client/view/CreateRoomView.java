@@ -32,7 +32,7 @@ public class CreateRoomView extends JDialog {
 	
 	private JLabel warningText;	
 	
-	private AddUsersView addUserView;
+	private AddUsersView addUsersView;
 	private List<JLabel> labels;
 	private List<JTextField> textFields;
 	private List<JButton> fieldButtons;
@@ -58,7 +58,7 @@ public class CreateRoomView extends JDialog {
 	
 	private void initComponents() {
 		
-		addUserView = new AddUsersView(this);
+		addUsersView = new AddUsersView(this);
 		
 		warningText = new JLabel();					
 		warningText.setForeground(Color.RED);		//Warning have red text
@@ -93,7 +93,7 @@ public class CreateRoomView extends JDialog {
 		});
 		
 		fieldButtons.get(0).addActionListener(event -> {
-			addUserView.setVisible(true);
+			addUsersView.setVisible(true);
 		});
 		
 	}
@@ -190,5 +190,6 @@ public class CreateRoomView extends JDialog {
 		textFields.forEach(field -> {
 			field.setText("");
 		});
+		addUsersView.clear();
 	}
 }

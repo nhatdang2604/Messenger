@@ -1,16 +1,14 @@
 package com.nhatdang2604.client.controller;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import com.nhatdang2604.client.view.CreateRoomView;
 import com.nhatdang2604.client.view.LoginView;
 import com.nhatdang2604.client.view.MenuView;
 import com.nhatdang2604.client.view.RegistrationView;
 import com.nhatdang2604.config.Configuration;
-import com.nhatdang2604.server.entities.ISendable;
-import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Packet;
 import com.nhatdang2604.server.entities.User;
 
@@ -23,6 +21,7 @@ public class Controller {
 	private LoginView loginView;
 	private RegistrationView registrationView;
 	private MenuView menuView;
+	private CreateRoomView createRoomView;
 	
 	//The login user
 	private User user;
@@ -61,6 +60,7 @@ public class Controller {
 		loginView = new LoginView();
 		registrationView = new RegistrationView(loginView);
 		menuView = new MenuView();
+		createRoomView = new CreateRoomView(menuView);
 		
 		user = null;
 		initNetwork(socket);
@@ -70,6 +70,7 @@ public class Controller {
 		gotoLogin();
 		gotoRegistration();
 		gotoMenu();
+		gotoCreateRoom();
 	}
 	
 	private void gotoLogin() {
@@ -93,6 +94,12 @@ public class Controller {
 		});
 	}
 	
+	private void gotoCreateRoom() {
+		menuView.getCreateRoomButton().addActionListener(event -> {
+			createRoomProcess();
+		});
+	}
+	
 	private void send(Packet packet) {
 		try {
 			writer = new ObjectOutputStream(this.socket.getOutputStream());
@@ -113,6 +120,13 @@ public class Controller {
 		}
 		
 		return null;
+	}
+	
+	private void createRoomProcess() {
+		createRoomView.clear();
+		createRoomView.setVisible(true);
+		
+		//TODO:
 	}
 	
 	private void registrateProcess() {

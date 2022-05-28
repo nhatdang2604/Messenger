@@ -129,6 +129,15 @@ public class AddUsersTable extends JTable {
 		return result;
 	}
 	
+	public AddUsersTable clear() {
+		int size = totalUsers.size();
+		for (int i = 0; i < size; ++i) {
+			tableModel.setValueAt(new Boolean(false), i, SELECT_COLUMN_INDEX);
+		}
+		
+		return this;
+	}
+	
 	public AddUsersTable setChosenUsers(Set<User> users) {
 		this.chosenUsers = users;
 		return this;

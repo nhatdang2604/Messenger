@@ -62,13 +62,13 @@ public class AddUsersView extends JDialog {
 	}
 
 
-	public AddUsersView(JDialog owner, Set<User> users) {
-		super(owner, true);
-		init();
-		setUsers(users);
-		this.table.update();
-	}
-	
+//	public AddUsersView(JDialog owner, Set<User> users) {
+//		super(owner, true);
+//		init();
+//		setUsers(users);
+//		this.table.update();
+//	}
+//	
 	public AddUsersView(JDialog owner) {
 		super(owner, true);
 		init();
@@ -94,6 +94,11 @@ public class AddUsersView extends JDialog {
 	
 	public AddUsersView update() {
 		table.update();
+		return this;
+	}
+	
+	public AddUsersView clear() {
+		table.clear();
 		return this;
 	}
 }
