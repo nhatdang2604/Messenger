@@ -32,16 +32,16 @@ public class CreateRoomView extends JDialog {
 	
 	private JLabel warningText;	
 	
+	private AddUsersView addUserView;
 	private List<JLabel> labels;
-	private List<JTextField> fields;
+	private List<JTextField> textFields;
+	private List<JButton> fieldButtons;
 	
 	private JButton okButton;
 	private JButton cancelButton;
 	
 	public static final int NO_ERROR = 0;
 	public static final int EMPTY_FIELD_ERROR = 1;
-	public static final int EXISTED_USERNAME_ERROR = 2;
-	public static final int PASSWORD_MISMATCH_ERROOR = 3;
 	
 	private static final String[] ERRORS = {
 			"",
@@ -58,6 +58,8 @@ public class CreateRoomView extends JDialog {
 	
 	private void initComponents() {
 		
+		addUserView = new AddUsersView(this);
+		
 		warningText = new JLabel();					
 		warningText.setForeground(Color.RED);		//Warning have red text
 		
@@ -66,15 +68,19 @@ public class CreateRoomView extends JDialog {
 		footerPanel = new JPanel();
 		
 		
-		fields = new ArrayList<>(Arrays.asList(
-				new JPasswordField()));
+		textFields = new ArrayList<>(Arrays.asList(
+				new JTextField()));
+		
+		fieldButtons = new ArrayList<>(Arrays.asList(
+				new JButton("Thêm")));
 		
 		okButton = new JButton("Tạo");
 		cancelButton = new JButton("Hủy");
 		
 		centerPanel = new JPanel();
 		labels = new ArrayList<>(Arrays.asList(
-				new JLabel("Tên phòng")
+				new JLabel("Tên phòng"),
+				new JLabel("Thêm thành viên")
 		));
 		
 		initButtons();
@@ -84,6 +90,10 @@ public class CreateRoomView extends JDialog {
 	private void initButtons() {
 		cancelButton.addActionListener((event)->{
 			this.dispose();
+		});
+		
+		fieldButtons.get(0).addActionListener(event -> {
+			addUserView.setVisible(true);
 		});
 		
 	}
@@ -107,7 +117,9 @@ public class CreateRoomView extends JDialog {
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
 				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC}));
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,}));
 		
 		for (int i = 0; i<labels.size(); ++i) {
 			String metaLayout = "4, " + (i+2)*2 + ", right, default";
@@ -115,9 +127,17 @@ public class CreateRoomView extends JDialog {
 		}
 		
 		centerPanel.add(warningText, "6, 2, center, default");
-		for (int i = 0; i < fields.size(); ++i) {
-			centerPanel.add(fields.get(i), "6, " + (i + 2) * 2 + ", fill, default");
+		int offset = 2;
+		int size = textFields.size();
+		for (int i = 0; i < size ; ++i) {
+			centerPanel.add(textFields.get(i), "6, " + (i + offset) * 2 + ", fill, default");
 		}
+		offset += size;
+		size = fieldButtons.size();
+		for (int i = 0; i < size; ++i) {
+			centerPanel.add(fieldButtons.get(i), "6, " + (i + offset) * 2 + ", fill, default");
+		}
+		
 		
 	}
 	
@@ -146,7 +166,7 @@ public class CreateRoomView extends JDialog {
 	
 	public boolean areThereAnyEmptyField() {
 		
-		for (JTextField field: fields)  {
+		for (JTextField field: textFields)  {
 			String text = field.getText().trim();
 			if (null == text || text.equals("")) {
 				return true;
@@ -159,7 +179,7 @@ public class CreateRoomView extends JDialog {
 	public Room submit() {
 		
 		Room room = new Room();
-		room.setName(fields.get(0).getText().trim());
+		room.setName(textFields.get(0).getText().trim());
 		room.setUsers(new TreeSet<>());
 		room.setMessages(new TreeSet<>());
 		
@@ -167,7 +187,7 @@ public class CreateRoomView extends JDialog {
 	}
 	
 	public void clear() {
-		fields.forEach(field -> {
+		textFields.forEach(field -> {
 			field.setText("");
 		});
 	}
