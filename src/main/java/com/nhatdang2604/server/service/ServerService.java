@@ -6,8 +6,12 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.nhatdang2604.config.Configuration;
 import com.nhatdang2604.server.entities.ISendable;
@@ -24,7 +28,8 @@ public enum ServerService {
 	
 	//Network stuffs
 	private ServerSocket serverSocket;
-	private List<Socket> sockets;
+	private Collection<Socket> connectedSockets;
+	private Map<User, List<Socket>> connectedUsers;
 	
 	//Configs
 	private Configuration configuration;
@@ -40,7 +45,8 @@ public enum ServerService {
 		roomService = RoomService.INSTANCE;
 		userService = UserService.INSTANCE;
 		
-		sockets = new ArrayList<>();
+		connectedSockets = Collections.synchronizedCollection(new ArrayList<>());
+		connectedUsers = new ConcurrentHashMap<>();
 		
 		//Try to create the socket via the port from configuration
 		try {
@@ -59,7 +65,38 @@ public enum ServerService {
 			sentUser = userService.login(recievedUser);
 		}
 		
+		if (null != sentUser) {
+			
+			//Make a copy identify for user
+			User key = new User();
+			key.setId(sentUser.getId());		
+			
+			if (!connectedUsers.containsKey(key)) {
+				
+				//Create <key, value> for the first time
+				List<Socket> buffer = new ArrayList<>();
+				buffer.add(socket);
+				
+				connectedUsers.put(key, buffer);
+			} else {
+				
+				//Update <key, value>
+				List<Socket> buffer = connectedUsers.get(key);
+				buffer.add(socket);
+				
+				connectedUsers.put(key, buffer);
+				
+			}
+		}
+		
 		send(sentUser, socket);
+		
+	}
+	
+	public void sendAllUsers(Socket socket) {
+		
+		List<User> allUsers = userService.findAllUser();
+		send(allUsers, socket);
 		
 	}
 	
@@ -98,8 +135,18 @@ public enum ServerService {
 			room = roomService.createRoom(room);
 		}
 		
-		//Send the created room to the client
-		send(room, socket);
+		//Send the current user state to all the members who are online
+		Set<User> members = room.getUsers();
+		for (User member: members) {
+			if (connectedUsers.containsKey(member)) {
+				
+				List<Socket> sockets = connectedUsers.get(member);
+				for (Socket soc: sockets) {
+					send(member, soc);
+				}
+				
+			}
+		}
 		
 	}
 	
@@ -115,7 +162,7 @@ public enum ServerService {
 		Set<User> users = message.getRoom().getUsers();
 		
 		//Send message to all the connected user
-		sockets.forEach(soc -> {
+		connectedSockets.forEach(soc -> {
 			send(message, soc);
 		});
 	}
@@ -134,7 +181,7 @@ public enum ServerService {
 		return packet;
 	}
 	
-	public ISendable send(ISendable sendable, Socket socket) { 
+	public Object send(Object sendable, Socket socket) { 
 		try {
 			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 			writer.writeObject(sendable);
@@ -167,7 +214,14 @@ public enum ServerService {
 			if (null == packet) {continue;}
 			
 			//Response base on the type of the packge
-			if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
+			if (null == packet.getSendable()) {
+				
+				//Get all users
+				if (Packet.TYPE_GET_ALL_USERS == packet.getSendType()) {
+					sendAllUsers(acceptanceSocket);
+				}
+				
+			} else if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
 				
 				if (Packet.TYPE_POST == packet.getSendType()) {
 					sendMessage(packet, acceptanceSocket);
@@ -182,7 +236,6 @@ public enum ServerService {
 				}
 				
 			} else if (ISendable.TYPE_USER == packet.getSendable().getType()) {
-				System.out.println("Client service start!");
 				
 				//Authenticate
 				if (Packet.TYPE_POST == packet.getSendType()) {
@@ -191,10 +244,7 @@ public enum ServerService {
 					registrate(packet, acceptanceSocket);
 				}
 				
-				System.out.println("Client service end!");
-				
 			}
-			
 		}
 	}
 	
@@ -219,10 +269,9 @@ public enum ServerService {
 			System.out.println("Waiting for new client...");
 			try {
 				Socket socket = (Socket) serverSocket.accept();
-				//handShake(socket);
 				
 				if (null != socket) {
-					sockets.add(socket);
+					connectedSockets.add(socket);
 					System.out.println(socket + " join the server");
 					Thread thread = new Thread(() -> {communicate(socket);});
 					thread.start();

@@ -1,5 +1,7 @@
 package com.nhatdang2604.server.service;
 
+import java.util.List;
+
 import com.nhatdang2604.server.dao.UserDAO;
 import com.nhatdang2604.server.entities.User;
 
@@ -81,6 +83,10 @@ public enum UserService {
 	
 	public User findUserById(Integer id) {
 		return userDAO.find(id);
+	}
+	
+	public List<User> findAllUser() {
+		return userDAO.findAll();
 	}
 }
  

@@ -1,5 +1,8 @@
 package com.nhatdang2604.server.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -115,6 +118,29 @@ public enum UserDAO {
 			
 		return client;
 		
+		
+	}
+
+	public List<User> findAll() {
+		
+		Session session = factory.getCurrentSession();
+		
+		List<User> users = new ArrayList<>();
+
+		try {
+			session.beginTransaction();
+			
+			users = session.createQuery("from " + User.class.getName()).list();
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+		
+		return users;
 		
 	}
 		

@@ -3,6 +3,7 @@ package com.nhatdang2604.client.controller;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 import com.nhatdang2604.client.view.CreateRoomView;
 import com.nhatdang2604.client.view.LoginView;
@@ -10,6 +11,7 @@ import com.nhatdang2604.client.view.MenuView;
 import com.nhatdang2604.client.view.RegistrationView;
 import com.nhatdang2604.config.Configuration;
 import com.nhatdang2604.server.entities.Packet;
+import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
 
 public class Controller {
@@ -98,6 +100,21 @@ public class Controller {
 		menuView.getCreateRoomButton().addActionListener(event -> {
 			createRoomProcess();
 		});
+		
+		gotoAddUser();
+	}
+	
+	private void gotoAddUser() {
+		createRoomView.getAddUsersButton().addActionListener(event -> {
+			
+			List<User> users = getAllUsers();
+			users.removeIf(u -> u.equals(user));
+			
+			createRoomView.setTotalUsers(users);
+			createRoomView.getAddUsersView().update();
+			createRoomView.getAddUsersView().setVisible(true);
+		});
+		
 	}
 	
 	private void send(Packet packet) {
@@ -126,12 +143,41 @@ public class Controller {
 		createRoomView.clear();
 		createRoomView.setVisible(true);
 		
-		//TODO:
+		//Validate the form first
+		if (createRoomView.areThereAnyEmptyField()) {
+			createRoomView.setError(RegistrationView.EMPTY_FIELD_ERROR);
+			createRoomView.clear();
+			return;
+		}
+		
+		//Get the room from the form
+		Room room = createRoomView.submit();
+		
+		//Add the creator of the room is also a member of the room
+		room.getUsers().add(user);
+		
+		//Create packet to send through network
+		Packet packet = new Packet();
+		packet.setSendable(room);
+		packet.setSender(user);
+		packet.setSendType(Packet.TYPE_CREATE);
+		
+		//Send the packet
+		send(packet);
+		
+		//Recieved the current user from the server
+		User foundUser = (User) recieved();
+		
+		if (null == foundUser) {
+			//Some error happend
+		} else {
+			user = foundUser;
+			menuView.setClient(user);
+		}
 	}
 	
 	private void registrateProcess() {
 	
-		
 		//Validate for the form
 		if (registrationView.areThereAnyEmptyField()) {
 			registrationView.setError(RegistrationView.EMPTY_FIELD_ERROR);
@@ -176,6 +222,21 @@ public class Controller {
 			registrationView.clear();
 		}
 		
+	}
+	
+	private List<User> getAllUsers() {
+		
+		Packet packet = new Packet();
+		packet.setSender(user);
+		packet.setSendType(Packet.TYPE_GET_ALL_USERS);
+		
+		//Send packet to recived all users
+		send(packet);
+		
+		//Recieved all users
+		List<User> users = (List<User>) recieved();
+		
+		return users;
 	}
 	
 	private void loginProcess() {

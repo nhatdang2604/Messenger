@@ -2,7 +2,7 @@ package com.nhatdang2604.client.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -24,7 +24,7 @@ public class AddUsersView extends JDialog {
 	private JScrollPane scrollPane;
 	private AddUsersTable table;
 	
-	private Set<User> users;
+	private List<User> users;
 	
 	private void initComponents() {
 		
@@ -82,9 +82,9 @@ public class AddUsersView extends JDialog {
 		return this;
 	}
 	
-	public AddUsersView setUsers(Set<User> users) {
+	public AddUsersView setTotalUsers(List<User> users) {
 		this.users = users;
-		this.table.setTotalUsers(new ArrayList<>(users));
+		this.table.setTotalUsers(users);
 		return this;
 	}
 	

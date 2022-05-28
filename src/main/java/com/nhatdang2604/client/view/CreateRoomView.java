@@ -92,10 +92,6 @@ public class CreateRoomView extends JDialog {
 			this.dispose();
 		});
 		
-		fieldButtons.get(0).addActionListener(event -> {
-			addUsersView.setVisible(true);
-		});
-		
 	}
 	
 	private void setLayout() {
@@ -165,6 +161,8 @@ public class CreateRoomView extends JDialog {
 	
 	
 	public JButton getOkButton() {return okButton;}
+	public JButton getAddUsersButton() {return fieldButtons.get(0);}
+	public AddUsersView getAddUsersView() {return addUsersView;}
 	
 	public boolean areThereAnyEmptyField() {
 		
@@ -182,7 +180,7 @@ public class CreateRoomView extends JDialog {
 		
 		Room room = new Room();
 		room.setName(textFields.get(0).getText().trim());
-		room.setUsers(new TreeSet<>());
+		room.setUsers(addUsersView.submit());
 		room.setMessages(new TreeSet<>());
 		
 		return room;
@@ -193,5 +191,9 @@ public class CreateRoomView extends JDialog {
 			field.setText("");
 		});
 		addUsersView.clear();
+	}
+	
+	public void setTotalUsers(List<User> users) {
+		addUsersView.setTotalUsers(users);
 	}
 }
