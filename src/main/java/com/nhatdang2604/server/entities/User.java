@@ -103,7 +103,7 @@ public class User implements ISendable, Serializable, Comparable<User> {
 		return isOnline;
 	}
 
-	public void setIsOnline(Boolean isOnline) {
+	public void setIsOnline(boolean isOnline) {
 		this.isOnline = isOnline;
 	}
 

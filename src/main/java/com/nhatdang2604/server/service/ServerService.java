@@ -183,7 +183,7 @@ public enum ServerService {
 	}
 	
 	public void logout(User user) {
-		userService.login(user);
+		userService.logout(user);
 	}
 	
 	public void logout(Socket socket) {
