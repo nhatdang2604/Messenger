@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -59,8 +60,6 @@ public class Controller {
 			
 		}
 		
-		System.out.println("STOPPPPPPPPP");
-		
 	}
 	
 	public Controller(Socket socket) {
@@ -83,9 +82,39 @@ public class Controller {
 		gotoRoom();
 	}
 	
+	
 	private void gotoLogin() {
 		loginView.setVisible(true);
-	}
+		menuView.getLogoutButton().addActionListener(event -> {
+			exitProcess();
+			
+			//Setup owner of the controller to null;
+			user = null;
+			
+			//Create new connection
+			try {
+				socket = new Socket(config.getIp(), config.getPort());
+				System.out.println(socket);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			//Close menuView
+			menuView.setVisible(false);
+			
+			//Open loginView
+			loginView.setVisible(true);
+			
+		});
+		
+		//Setup for exit, after closing login view
+		loginView.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent we) {
+				exitProcess();
+			}
+		});
+ 	}
 	
 	private void gotoRegistration() {
 		loginView.getRegistrateButton().addActionListener(event -> {
@@ -120,7 +149,6 @@ public class Controller {
 		menuView.addWindowListener(new WindowAdapter() {
 		    @Override
 		    public void windowClosing(WindowEvent we) {
-		    	logoutProcess();
 		    	exitProcess();
 		    }
 		});
@@ -422,22 +450,20 @@ public class Controller {
 	}
 	
 	private void exitProcess() {
+		
+		isOpenChatView = false;
+		
+		//Create packet to send through network
+		Packet packet = new Packet();
+		packet.setSendType(Packet.TYPE_LOGOUT);
+						
+		//Send the packet
+		send(packet);
+		
 		try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		isOpenChatView = false;
-	}
-	
-	private void logoutProcess() {
-		
-		//Create packet to send through network
-		Packet packet = new Packet();
-		packet.setSendType(Packet.TYPE_LOGOUT);
-				
-		//Send the packet
-		send(packet);
 	}
 }

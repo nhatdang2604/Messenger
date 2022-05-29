@@ -2,8 +2,8 @@ package com.nhatdang2604.client.view;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +20,8 @@ public class MenuView extends JFrame {
 	final protected int WIDTH = 500;
 	
 	private JButton createRoomButton;
+	private JButton logoutButton;
+	
 	private RoomTable table;
 	
 	private JPanel headerPanel;
@@ -30,6 +32,8 @@ public class MenuView extends JFrame {
 	
 	private void initComponents() {
 		createRoomButton = new JButton("Tạo phòng chat");
+		logoutButton = new JButton("Đăng xuất");
+		
 		table = new RoomTable();
 		
 		headerPanel = new JPanel();
@@ -43,6 +47,7 @@ public class MenuView extends JFrame {
 		headerPanel.setLayout(new BorderLayout());
 		roomPanel.setLayout(new BorderLayout());
 		
+		headerPanel.add(logoutButton, BorderLayout.WEST);
 		headerPanel.add(createRoomButton, BorderLayout.EAST);
 		roomPanel.add(scrollPane, BorderLayout.CENTER);
 		
@@ -96,11 +101,15 @@ public class MenuView extends JFrame {
 	
 	public void setClient(User client) {
 		this.client = client;
-		this.table.setRooms(new ArrayList<>(this.client.getRooms()));
+		
+		List<Room> rooms = new ArrayList<>(this.client.getRooms());
+		Collections.sort(rooms);
+		this.table.setRooms(rooms);
 		this.table.update();
 	}
 	
 	public JButton getCreateRoomButton() {return createRoomButton;}
+	public JButton getLogoutButton() {return logoutButton;}
 	
 	public RoomTable getRoomTable() {return table;}
 }

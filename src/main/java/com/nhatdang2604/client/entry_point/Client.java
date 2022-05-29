@@ -12,9 +12,7 @@ public class Client {
 	
 	public void connect(Configuration config) {
 		try {
-			System.out.println("Before connecting");
 			socket = new Socket(config.getIp(), config.getPort());
-			System.out.println("After connecting");
 			System.out.println(socket);
 		} catch (Exception e) {
 			e.printStackTrace();
