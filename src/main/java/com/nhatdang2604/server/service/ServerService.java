@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +31,7 @@ public enum ServerService {
 	//Network stuffs
 	private ServerSocket serverSocket;
 	private Collection<Socket> connectedSockets;
-	private Map<Integer, List<Socket>> connectedUsers;	//Integer is id of the user
+	private Map<Integer, Set<Socket>> connectedUsers;	//Integer is id of the user
 	
 	//Configs
 	private Configuration configuration;
@@ -73,14 +75,14 @@ public enum ServerService {
 			if (!connectedUsers.containsKey(key)) {
 				
 				//Create <key, value> for the first time
-				List<Socket> buffer = new ArrayList<>();
+				Set<Socket> buffer = new HashSet<>();
 				buffer.add(socket);
 				
 				connectedUsers.put(key, buffer);
 			} else {
 				
 				//Update <key, value>
-				List<Socket> buffer = connectedUsers.get(key);
+				Set<Socket> buffer = connectedUsers.get(key);
 				buffer.add(socket);
 				
 				connectedUsers.put(key, buffer);
@@ -140,7 +142,7 @@ public enum ServerService {
 		for (User member: members) {
 			if (connectedUsers.containsKey(member.getId())) {
 				
-				List<Socket> sockets = connectedUsers.get(member.getId());
+				Set<Socket> sockets = connectedUsers.get(member.getId());
 				for (Socket soc: sockets) {
 					send(member, soc);
 				}
@@ -165,12 +167,51 @@ public enum ServerService {
 		for (User member: members) {
 			if (connectedUsers.containsKey(member.getId())) {
 				
-				List<Socket> sockets = connectedUsers.get(member.getId());
+				Set<Socket> sockets = connectedUsers.get(member.getId());
 				for (Socket soc: sockets) {
 					send(message, soc);
 				}
 				
 			}
+		}
+	}
+	
+	//Logout a user with a given id
+	public void logout(Integer id) {
+		User user = userService.findUserById(id);
+		logout(user);
+	}
+	
+	public void logout(User user) {
+		userService.login(user);
+	}
+	
+	public void logout(Socket socket) {
+		
+		connectedSockets.removeIf(soc -> soc.equals(socket));
+		Iterator<Map.Entry<Integer, Set<Socket>>> iterator = connectedUsers.entrySet().iterator();
+		
+		while (iterator.hasNext()) {
+			Map.Entry<Integer, Set<Socket>> entry = iterator.next();
+			Set<Socket> buffer = entry.getValue();
+			if(buffer.contains(socket)) {
+				buffer.removeIf(soc -> soc.equals(socket));	//avoid ConcurrentModificationExpection
+				
+				if (buffer.isEmpty()) {
+					Integer key = entry.getKey();
+					connectedUsers.remove(entry.getKey());
+					logout(key);
+				}
+				
+				break;
+			}
+		}
+		
+		try {
+			socket.close();
+			System.out.println(socket + " is disconnected");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -183,6 +224,7 @@ public enum ServerService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			packet = null;
 		}
 		
 		return packet;
@@ -202,17 +244,12 @@ public enum ServerService {
 		return sendable;
 	}
 	
+	
+	
 	public void communicate(Socket acceptanceSocket) {
 		while (true) {
 			
-			if (exitFlag) {
-				try {
-					acceptanceSocket.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+			if (acceptanceSocket.isClosed()) {
 				break;
 			}
 			
@@ -226,6 +263,8 @@ public enum ServerService {
 				//Get all users
 				if (Packet.TYPE_GET_ALL_USERS == packet.getSendType()) {
 					sendAllUsers(acceptanceSocket);
+				} else if (Packet.TYPE_LOGOUT == packet.getSendType()) {
+					logout(acceptanceSocket);
 				}
 				
 			} else if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
@@ -253,14 +292,6 @@ public enum ServerService {
 				
 			}
 		}
-	}
-	
-	public void handShake(Socket socket) {
-		
-		Message message = new Message();
-		message.setContent("Accepted");
-		send(message, socket);
-		
 	}
 	
 	public void run() {
@@ -291,8 +322,25 @@ public enum ServerService {
 	
 	}
 
+	public void disconnectAllSockets() {
+		for (Socket socket: connectedSockets) {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for(Iterator<Map.Entry<Integer, Set<Socket>>> it = connectedUsers.entrySet().iterator(); it.hasNext(); ) {
+		    Map.Entry<Integer, Set<Socket>> entry = it.next();
+		    logout(entry.getKey());
+		}
+		
+	}
+	
 	public void stop() {
 		try {
+			disconnectAllSockets();
 			serverSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();

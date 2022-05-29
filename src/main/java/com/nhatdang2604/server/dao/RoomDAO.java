@@ -73,24 +73,6 @@ public enum RoomDAO {
 		
 		try {
 			session.beginTransaction();
-//			room = session.get(Room.class, id);
-//			
-//			//Because fetch hql can not use the .setMaxResult or .findFirst() to get single result
-//			if (null != room) {
-//				String param = "id";
-//				String query = 
-//						"select r " +
-//						"from " + Room.class.getName() + " r " + 
-//						"join fetch r.messages " +
-//						"join fetch r.users " + 
-//						"where r.id = :" + param;
-//				
-//				room = session
-//						.createQuery(query, Room.class)
-//						.setParameter(param, id)
-//						.getSingleResult();
-//				
-//			}
 			
 			String param = "id";
 			String query = 
@@ -98,7 +80,7 @@ public enum RoomDAO {
 					"from " + Room.class.getName() + " r " + 
 					"left join fetch r.messages message " +
 					"left join fetch r.users " +
-					"join fetch message.user " + 
+					"left join fetch message.user " + 
 					"where r.id = :" + param;
 			
 			try {

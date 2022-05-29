@@ -32,8 +32,10 @@ public class LoginView extends JFrame {
 	//	1.) Wrong password or username: Type = 0
 	private JLabel jlbWarningText;		
 	
-	public static final int WRONG_ACCOUNT_ERROR = 0;
+	public static final int NO_ERROR = 0;
+	public static final int WRONG_ACCOUNT_ERROR = 1;
 	private static final String[] ERRORS = {
+		"",
 		"Sai mật khẩu hoặc tên đăng nhập"
 	};
 	
@@ -148,7 +150,6 @@ public class LoginView extends JFrame {
 	public void clear() {
 		txtUsername.setText("");
 		passtxtPassword.setText("");
-		jlbWarningText.setText("");
 	}
 	
 	public static void main(String[] args) {

@@ -58,6 +58,11 @@ public enum UserService {
 		return foundUser;
 	}
 
+	public User logout(User user) {
+		user.setIsOnline(false);
+		return updateUser(user);
+	}
+	
 	public User getUserByUsername(String username) {
 		return userDAO.getUserByUsername(username);
 	}

@@ -2,10 +2,15 @@ package com.nhatdang2604.client.controller;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import com.nhatdang2604.client.view.ChatView;
 import com.nhatdang2604.client.view.CreateRoomView;
@@ -42,13 +47,20 @@ public class Controller {
 	private ObjectOutputStream writer;
 	private ObjectInputStream reader;
 	
+	private Queue<Message> messageQueue;
+	
 	private void initChatThread() {
+		messageQueue = new PriorityBlockingQueue<>();
 		this.chatThread = new Thread(() -> {
 			
 			//Run until the client app is closed
 			while(isOpenChatView) {
 				Message message = (Message) recieved();
-				chatView.addNewMessage(message);
+				
+				if (message.getRoom().getId().equals(chatView.getRoom().getId())) {
+					chatView.addNewMessage(message);
+				}
+				
 			}
 			
 		});
@@ -111,6 +123,17 @@ public class Controller {
 		createRoomView.getOkButton().addActionListener(event -> {
 			createRoomProcess();
 		});
+		
+		//Setup for exit, after close menu
+		menuView.addWindowListener(new WindowAdapter() {
+		    @Override
+		    public void windowClosing(WindowEvent we) {
+		    	logoutProcess();
+		    	exitProcess();
+		    }
+		});
+		
+		
 	}
 	
 	private void gotoCreateRoom() {
@@ -191,7 +214,6 @@ public class Controller {
 	}
 	
 	private void joinRoomProcess() {
-		//TODO:
 		
 		//Get the room to join
 		Room room = menuView.getRoomTable().getSelectedRoom();
@@ -206,8 +228,15 @@ public class Controller {
 		send(packet);
 		
 		//Recieved the room from the server
-		room = (Room) recieved();
-		
+		// Recieved until get a room
+		while (true) {
+			try {
+				room = (Room) recieved();
+				break;
+			} catch (Exception e) {
+				// do nothing
+			}
+		}
 		//Set data of the room the view
 		chatView.setRoom(room);
 		
@@ -242,8 +271,18 @@ public class Controller {
 		//Send the packet
 		send(packet);
 		
+		User foundUser = null;
+		
 		//Recieved the current user from the server
-		User foundUser = (User) recieved();
+		// Recieved until get a user
+		while (true) {
+			try {
+				foundUser = (User) recieved();
+				break;
+			} catch (Exception e) {
+				// do nothing
+			}
+		}
 		
 		System.out.println(foundUser.getRooms().size());
 		
@@ -315,9 +354,17 @@ public class Controller {
 		//Send packet to recived all users
 		send(packet);
 		
-		//Recieved all users
-		List<User> users = (List<User>) recieved();
+		List<User> users = null;
 		
+		//Recieved all users
+		while (true) {
+			try {
+				users = (List<User>) recieved();
+				break;
+			} catch (Exception e) {
+				//do nothing
+			}
+		}
 		return users;
 	}
 	
@@ -341,12 +388,15 @@ public class Controller {
 			} else {
 				
 				//Login sucessfully
+				loginView.setError(LoginView.NO_ERROR);
+				
 				this.user = foundUser;
 				menuView.setClient(foundUser);
 				menuView.setVisible(true);
 				loginView.setVisible(false);
 				
 				chatView.setUser(user);
+				
 			}
 			
 			System.out.println(foundUser);
@@ -361,4 +411,23 @@ public class Controller {
 		}
 	}
 	
+	private void exitProcess() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		isOpenChatView = false;
+	}
+	
+	private void logoutProcess() {
+		
+		//Create packet to send through network
+		Packet packet = new Packet();
+		packet.setSendType(Packet.TYPE_LOGOUT);
+				
+		//Send the packet
+		send(packet);
+	}
 }

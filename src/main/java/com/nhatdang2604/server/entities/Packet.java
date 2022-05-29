@@ -13,6 +13,7 @@ public class Packet implements Serializable {
 	public static final int TYPE_POST = 1;
 	public static final int TYPE_CREATE = 2;
 	public static final int TYPE_GET_ALL_USERS = 3;
+	public static final int TYPE_LOGOUT = 4;
 	
 	private User sender;
 	private ISendable sendable;
