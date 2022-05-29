@@ -29,21 +29,51 @@ public enum UserDAO {
 		try {
 			session.beginTransaction();
 			
-			//Parameterize the query
+//			//Parameterize the query
+//			String param = "username";
+//			
+//			//Make the query
+//			String query = "from " + User.class.getName() + " u where u.username = :" + param;
+//			
+//			user = (User) session.createQuery(query, User.class)
+//					.setParameter(param, username)
+//					.setMaxResults(1)
+//					.stream()
+//					.findFirst()
+//					.orElse(null);
+//			
+//			System.out.println(user.getId());
+//			
+//			//Fetch room to the user
+//			if (null != user) {
+//				param = "id";
+//				query = "select u " +
+//						"from " + User.class.getName() + " u " + 
+//						"join fetch u.rooms " + 
+//						"where u.id = :" + param;
+//				
+//				user = session
+//						.createQuery(query, User.class)
+//						.setParameter(param, user.getId())
+//						.getSingleResult();
+//				
+//			}
+//			
 			String param = "username";
-			
-			//Make the query
-			String query = 
+			String query = "select u " +
 					"from " + User.class.getName() + " u " + 
-					"join fetch u.rooms " + 
+					"left join fetch u.rooms " + 
 					"where u.username = :" + param;
 			
-			user = (User) session.createQuery(query)
-					.setParameter(param, username)
-					.setMaxResults(1)
-					.stream()
-					.findFirst()
-					.orElse(null);
+			try {
+				user = session
+						.createQuery(query, User.class)
+						.setParameter(param, username)
+						.getSingleResult();
+			} catch (javax.persistence.NoResultException e) {
+				user = null;
+			}
+	
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

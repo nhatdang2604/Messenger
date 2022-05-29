@@ -73,7 +73,7 @@ public class ChatView extends JDialog {
 	
 	public ChatView(JFrame owner) {
 		super(owner);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		
 		initComponents();
@@ -147,6 +147,10 @@ public class ChatView extends JDialog {
 	public void setRoom(Room room) {
 		this.room = room;
 		load(room.getMessages());
+	}
+	
+	public Room getRoom() {
+		return room;
 	}
 	
 	public void load(Set<Message> messages) {

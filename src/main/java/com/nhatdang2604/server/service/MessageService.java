@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 import com.nhatdang2604.server.dao.MessageDAO;
 import com.nhatdang2604.server.entities.ISendable;
@@ -43,7 +44,12 @@ public enum MessageService {
 //	}
 	
 	public Message createMessage(Message message) {
-		return messageDAO.create(message);
+		
+		message.setDateTime(LocalDateTime.now());
+		Message returnMessage = messageDAO.create(message);
+		returnMessage = messageDAO.find(returnMessage.getId());
+		
+		return returnMessage;
 	}
 
 }

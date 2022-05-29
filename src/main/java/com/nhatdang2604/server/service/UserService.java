@@ -45,6 +45,8 @@ public enum UserService {
 		
 		//Authenticate
 		User foundUser = getUserByUsername(user.getUsername());
+		
+		System.out.println(foundUser);
 		foundUser = (isAuthenticated(user, foundUser)?foundUser:null);
 		
 		//Make the user online, if login sucessfully

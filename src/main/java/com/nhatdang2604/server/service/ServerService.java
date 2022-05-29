@@ -156,15 +156,22 @@ public enum ServerService {
 		Message message = (Message) packet.getSendable();
 		
 		//Save the message to database
-		messageService.createMessage(message);
+		message = messageService.createMessage(message);
 		
 		//Get all the members in the room
-		Set<User> users = message.getRoom().getUsers();
+		Set<User> members = message.getRoom().getUsers();
 		
-		//Send message to all the connected user
-		connectedSockets.forEach(soc -> {
-			send(message, soc);
-		});
+		//Send message to all the member in the room
+		for (User member: members) {
+			if (connectedUsers.containsKey(member.getId())) {
+				
+				List<Socket> sockets = connectedUsers.get(member.getId());
+				for (Socket soc: sockets) {
+					send(message, soc);
+				}
+				
+			}
+		}
 	}
 	
 	public Packet recieve(Socket acceptanceSocket) {

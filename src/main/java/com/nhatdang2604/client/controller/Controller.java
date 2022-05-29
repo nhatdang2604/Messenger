@@ -1,15 +1,19 @@
 package com.nhatdang2604.client.controller;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
+import com.nhatdang2604.client.view.ChatView;
 import com.nhatdang2604.client.view.CreateRoomView;
 import com.nhatdang2604.client.view.LoginView;
 import com.nhatdang2604.client.view.MenuView;
 import com.nhatdang2604.client.view.RegistrationView;
 import com.nhatdang2604.config.Configuration;
+import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Packet;
 import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
@@ -20,29 +24,31 @@ public class Controller {
 	private Configuration config;
 	
 	//Flag
-	private boolean isClose;
+	private boolean isOpenChatView;
 	
 	//Views
 	private LoginView loginView;
 	private RegistrationView registrationView;
 	private MenuView menuView;
 	private CreateRoomView createRoomView;
+	private ChatView chatView;
 	
 	//The login user
 	private User user;
 	
 	//Network stuffs
 	private Socket socket;
-	private Thread listenerThread;
+	private Thread chatThread;
 	private ObjectOutputStream writer;
 	private ObjectInputStream reader;
 	
-	private void initListener() {
-		this.listenerThread = new Thread(() -> {
+	private void initChatThread() {
+		this.chatThread = new Thread(() -> {
 			
 			//Run until the client app is closed
-			while(!isClose) {
-				
+			while(isOpenChatView) {
+				Message message = (Message) recieved();
+				chatView.addNewMessage(message);
 			}
 			
 		});
@@ -50,7 +56,6 @@ public class Controller {
 	
 	private void initNetwork(Socket socket) {
 		this.socket = socket;
-		
 	}
 	
 	public Controller(Socket socket) {
@@ -59,10 +64,11 @@ public class Controller {
 		registrationView = new RegistrationView(loginView);
 		menuView = new MenuView();
 		createRoomView = new CreateRoomView(menuView);
-		isClose = false;
+		chatView = new ChatView(menuView);
+		isOpenChatView = false;
 		user = null;
 		initNetwork(socket);
-		//initListener();
+		initChatThread();
 	}
 
 	public void run() {
@@ -90,8 +96,11 @@ public class Controller {
 	
 	private void gotoRoom() {
 		menuView.getRoomTable().getJoinButton().addActionListener(event -> {
+			isOpenChatView = true;
 			joinRoomProcess();
 		});
+		sendMessageProcessSetup();
+		exitRoomSetup();
 	}
 	
 	private void gotoMenu() {
@@ -148,8 +157,65 @@ public class Controller {
 		return null;
 	}
 	
+	private void exitRoomSetup() {
+		chatView.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				isOpenChatView = false;
+				chatThread.stop();
+			}
+		});
+	}
+	
+	private void sendMessageProcessSetup() {
+		chatView.getSendButton().addActionListener(event -> {
+			
+			//Set data of the message
+			Message message = new Message();
+			message.setUser(user);
+			message.setDataType(Message.TYPE_TEXT);
+			message.setRoom(chatView.getRoom());
+	
+			String content = chatView.getTypeField().getText();
+			message.setContent(content);
+			
+			//Send the message to the server
+			Packet packet = new Packet();
+			packet.setSendType(packet.TYPE_POST);
+			packet.setSendable(message);
+			packet.setSender(user);
+			send(packet);
+			
+		});
+		
+	}
+	
 	private void joinRoomProcess() {
 		//TODO:
+		
+		//Get the room to join
+		Room room = menuView.getRoomTable().getSelectedRoom();
+		
+		//Packet to send through the internet;
+		Packet packet = new Packet();
+		packet.setSendable(room);
+		packet.setSendType(Packet.TYPE_GET);
+		
+		
+		//Send the packet
+		send(packet);
+		
+		//Recieved the room from the server
+		room = (Room) recieved();
+		
+		//Set data of the room the view
+		chatView.setRoom(room);
+		
+		//Start the thread to recieved messages
+		chatThread.start();
+		
+		//Open the chat room
+		chatView.open();
 	}
 	
 	private void createRoomProcess() {
@@ -186,9 +252,7 @@ public class Controller {
 		} else {
 			user = foundUser;
 			menuView.setClient(user);
-			
-			//Start the listener thread (after login sucessfully)
-			//listenerThread.start();
+			chatView.setUser(user);
 		}
 		
 		createRoomView.setVisible(false);
@@ -281,7 +345,11 @@ public class Controller {
 				menuView.setClient(foundUser);
 				menuView.setVisible(true);
 				loginView.setVisible(false);
+				
+				chatView.setUser(user);
 			}
+			
+			System.out.println(foundUser);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
