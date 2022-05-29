@@ -271,6 +271,9 @@ public enum ServerService {
 				
 				if (Packet.TYPE_POST == packet.getSendType()) {
 					sendMessage(packet, acceptanceSocket);
+				} else if (Packet.TYPE_STOP_THREAD == packet.getSendType()) {
+					Message dummy = (Message) packet.getSendable();
+					send(dummy, acceptanceSocket);
 				}
 				
 			} else if (ISendable.TYPE_ROOM == packet.getSendable().getType()) {

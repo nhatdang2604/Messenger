@@ -47,30 +47,24 @@ public class Controller {
 	private ObjectOutputStream writer;
 	private ObjectInputStream reader;
 	
-	private Queue<Message> messageQueue;
-	
-	private void initChatThread() {
-		messageQueue = new PriorityBlockingQueue<>();
-		this.chatThread = new Thread(() -> {
+	private void chatThreadImpl() {
+		
+		//Run until the client app is closed
+		while(isOpenChatView) {
+			Message message = (Message) recieved();
 			
-			//Run until the client app is closed
-			while(isOpenChatView) {
-				Message message = (Message) recieved();
-				
-				if (message.getRoom().getId().equals(chatView.getRoom().getId())) {
-					chatView.addNewMessage(message);
-				}
-				
+			if (chatView.getRoom().getId().equals(message.getRoom().getId())) {
+				chatView.addNewMessage(message);
 			}
 			
-		});
-	}
-	
-	private void initNetwork(Socket socket) {
-		this.socket = socket;
+		}
+		
+		System.out.println("STOPPPPPPPPP");
+		
 	}
 	
 	public Controller(Socket socket) {
+		this.socket = socket;
 		config = Configuration.INSTANCE;
 		loginView = new LoginView();
 		registrationView = new RegistrationView(loginView);
@@ -79,8 +73,6 @@ public class Controller {
 		chatView = new ChatView(menuView);
 		isOpenChatView = false;
 		user = null;
-		initNetwork(socket);
-		initChatThread();
 	}
 
 	public void run() {
@@ -185,13 +177,29 @@ public class Controller {
 			@Override
 			public void componentHidden(ComponentEvent e) {
 				isOpenChatView = false;
-				chatThread.stop();
+				System.out.println("TRY TO STOPPPPPPPPP");
+				
+				//Send a dummy message to the socket, forcing the recived() stop blocking and end the chatThread
+				Message dummy = new Message();
+				Room dummyRoom = new Room();
+				dummy.setRoom(dummyRoom);
+				
+				//Send the message to the server
+				Packet packet = new Packet();
+				packet.setSendType(Packet.TYPE_STOP_THREAD);
+				packet.setSendable(dummy);
+				send(packet);
+				
 			}
 		});
 	}
 	
+
 	private void sendMessageProcessSetup() {
 		chatView.getSendButton().addActionListener(event -> {
+			
+			//Clear the type field
+			chatView.getTypeField().setText("");
 			
 			//Set data of the message
 			Message message = new Message();
@@ -204,11 +212,10 @@ public class Controller {
 			
 			//Send the message to the server
 			Packet packet = new Packet();
-			packet.setSendType(packet.TYPE_POST);
+			packet.setSendType(Packet.TYPE_POST);
 			packet.setSendable(message);
 			packet.setSender(user);
 			send(packet);
-			
 		});
 		
 	}
@@ -238,9 +245,11 @@ public class Controller {
 			}
 		}
 		//Set data of the room the view
+		chatView.clearChat();
 		chatView.setRoom(room);
 		
 		//Start the thread to recieved messages
+		chatThread = new Thread(() -> {chatThreadImpl();});
 		chatThread.start();
 		
 		//Open the chat room
@@ -284,15 +293,19 @@ public class Controller {
 			}
 		}
 		
-		System.out.println(foundUser.getRooms().size());
+//		System.out.println(foundUser.getRooms().size());
 		
-		if (null == foundUser) {
-			//Some error happend
-		} else {
-			user = foundUser;
-			menuView.setClient(user);
-			chatView.setUser(user);
-		}
+//		if (null == foundUser) {
+//			//Some error happend
+//		} else {
+//			user = foundUser;
+//			menuView.setClient(user);
+//			chatView.setUser(user);
+//		}
+//		
+		user = foundUser;
+		menuView.setClient(user);
+		chatView.setUser(user);
 		
 		createRoomView.setVisible(false);
 	}
@@ -320,10 +333,7 @@ public class Controller {
 			System.out.println(packet.getSendable());
 			send(packet);
 			
-			
-			System.out.println("Send from the registration");
 			User foundClient = (User) recieved();
-			System.out.println("Recieved to the registration");
 			
 			//Login failed
 			if (null == foundClient) {

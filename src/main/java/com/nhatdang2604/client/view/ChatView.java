@@ -2,6 +2,9 @@ package com.nhatdang2604.client.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -23,7 +26,7 @@ import com.nhatdang2604.server.entities.User;
 public class ChatView extends JDialog {
 
 	final protected int HEIGHT = 700;
-	final protected int WIDTH = 1250;
+	final protected int WIDTH = 450;
 	
 	private JButton sendButton;
 	private JTextField typeField;
@@ -72,7 +75,7 @@ public class ChatView extends JDialog {
 	}
 	
 	public ChatView(JFrame owner) {
-		super(owner);
+		super(owner, true);
 		setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		
@@ -153,8 +156,10 @@ public class ChatView extends JDialog {
 		return room;
 	}
 	
-	public void load(Set<Message> messages) {
-		messages.forEach(message -> {
+	public void load(Set<Message> messages) { 
+		List<Message> list = new ArrayList<>(messages);
+		Collections.sort(list);
+		list.forEach(message -> {
 			addNewMessage(message);
 		});
 		
@@ -163,6 +168,9 @@ public class ChatView extends JDialog {
 	public JButton getSendButton() {return sendButton;}
 	public JTextField getTypeField() {return typeField;}
 	
+	public void clearChat() {
+		this.messagePane.setText("");
+	}
 	public void open() {
 		this.setVisible(true);
 	}

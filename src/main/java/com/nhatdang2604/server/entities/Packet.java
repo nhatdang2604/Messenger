@@ -14,6 +14,7 @@ public class Packet implements Serializable {
 	public static final int TYPE_CREATE = 2;
 	public static final int TYPE_GET_ALL_USERS = 3;
 	public static final int TYPE_LOGOUT = 4;
+	public static final int TYPE_STOP_THREAD = 5;
 	
 	private User sender;
 	private ISendable sendable;
