@@ -33,7 +33,10 @@ public enum UserDAO {
 			String param = "username";
 			
 			//Make the query
-			String query = "from " + User.class.getName() + " u where u.username = :" + param;
+			String query = 
+					"from " + User.class.getName() + " u " + 
+					"join fetch u.rooms " + 
+					"where u.username = :" + param;
 			
 			user = (User) session.createQuery(query)
 					.setParameter(param, username)
@@ -41,10 +44,6 @@ public enum UserDAO {
 					.stream()
 					.findFirst()
 					.orElse(null);
-			
-			if (null != user) {
-				Hibernate.initialize(user.getRooms());
-			}
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

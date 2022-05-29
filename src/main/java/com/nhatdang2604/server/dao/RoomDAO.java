@@ -73,11 +73,26 @@ public enum RoomDAO {
 		
 		try {
 			session.beginTransaction();
-			room = session.get(Room.class, id);
+//			room = session.get(Room.class, id);
+//			
+//			for (User user: room.getUsers()) {
+//				Hibernate.initialize(user);
+//			}	
 			
-			for (User user: room.getUsers()) {
-				Hibernate.initialize(user);
-			}	
+			String param = "id";
+			String query = 
+					"from " + Room.class.getName() + " r " + 
+					"join fetch r.messages " +
+					"join fetch r.users " + 
+					"where r.id = :" + param;
+			
+			room = (Room) session
+					.createQuery(query)
+					.setParameter(param, id)
+					.setMaxResults(1)
+					.stream()
+					.findFirst()
+					.orElse(null);
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

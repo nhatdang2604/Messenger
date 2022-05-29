@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.util.Set;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -16,9 +17,10 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
 
-public class ChatView extends JFrame {
+public class ChatView extends JDialog {
 
 	final protected int HEIGHT = 700;
 	final protected int WIDTH = 1250;
@@ -30,7 +32,9 @@ public class ChatView extends JFrame {
 	private JPanel messagePanel;
 	private JScrollPane scrollPane;
 	
-	private User owner;
+	private Room room;
+	
+	private User user;
 	
 	private void initComponents() {
 		sendButton = new JButton("Gửi");
@@ -67,11 +71,11 @@ public class ChatView extends JFrame {
 		
 	}
 	
-	public ChatView(User owner) {
+	public ChatView(JFrame owner) {
+		super(owner);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
 		
-		this.owner = owner;
 		initComponents();
 		setLayout();
 		
@@ -123,7 +127,7 @@ public class ChatView extends JFrame {
 		Color messageColor = Color.BLACK;
 		
 		//Change the color the of the name's text
-		if (!client.getId().equals(owner.getId())) 
+		if (!client.getId().equals(user.getId())) 
 		{
 			nameColor = Color.RED;
 		} 
@@ -132,6 +136,17 @@ public class ChatView extends JFrame {
 		addTextToMessagePane(client.getUsername() + ": ", nameColor);
 		addTextToMessagePane(message.getContent() + "\r\n", messageColor);
 		
+		//Add message to the model
+		room.getMessages().add(message);
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public void setRoom(Room room) {
+		this.room = room;
+		load(room.getMessages());
 	}
 	
 	public void load(Set<Message> messages) {
@@ -143,5 +158,9 @@ public class ChatView extends JFrame {
 	
 	public JButton getSendButton() {return sendButton;}
 	public JTextField getTypeField() {return typeField;}
+	
+	public void open() {
+		this.setVisible(true);
+	}
 	
 }

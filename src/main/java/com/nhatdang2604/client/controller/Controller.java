@@ -62,7 +62,7 @@ public class Controller {
 		isClose = false;
 		user = null;
 		initNetwork(socket);
-		initListener();
+		//initListener();
 	}
 
 	public void run() {
@@ -70,6 +70,7 @@ public class Controller {
 		gotoRegistration();
 		gotoMenu();
 		gotoCreateRoom();
+		gotoRoom();
 	}
 	
 	private void gotoLogin() {
@@ -84,6 +85,12 @@ public class Controller {
 		
 		registrationView.getOkButton().addActionListener(event -> {
 			registrateProcess();
+		});
+	}
+	
+	private void gotoRoom() {
+		menuView.getRoomTable().getJoinButton().addActionListener(event -> {
+			joinRoomProcess();
 		});
 	}
 	
@@ -141,6 +148,10 @@ public class Controller {
 		return null;
 	}
 	
+	private void joinRoomProcess() {
+		//TODO:
+	}
+	
 	private void createRoomProcess() {
 		
 		//Validate the form first
@@ -177,7 +188,7 @@ public class Controller {
 			menuView.setClient(user);
 			
 			//Start the listener thread (after login sucessfully)
-			listenerThread.start();
+			//listenerThread.start();
 		}
 		
 		createRoomView.setVisible(false);

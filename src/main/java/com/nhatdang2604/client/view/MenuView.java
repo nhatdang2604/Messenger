@@ -102,4 +102,5 @@ public class MenuView extends JFrame {
 	
 	public JButton getCreateRoomButton() {return createRoomButton;}
 	
+	public RoomTable getRoomTable() {return table;}
 }
