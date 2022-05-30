@@ -41,12 +41,14 @@ public enum ServerService {
 	private MessageService messageService;
 	private RoomService roomService;
 	private UserService userService;
+	private FileService fileService;
 	
 	private ServerService() {
 		configuration = Configuration.INSTANCE;
 		messageService = MessageService.INSTANCE;
 		roomService = RoomService.INSTANCE;
 		userService = UserService.INSTANCE;
+		fileService = FileService.INSTANCE;
 		
 		connectedSockets = Collections.synchronizedCollection(new ArrayList<>());
 		connectedUsers = new ConcurrentHashMap<>();
@@ -160,13 +162,12 @@ public enum ServerService {
 		
 		//Process if the message is a file
 		if (Message.TYPE_FILE == message.getType()) {
+			message = fileService.recievedFileFromClient(message);
+		} else if (Message.TYPE_TEXT == message.getType()) {
 			
-			FileInfo file = message.getFileInfo();
-			
+			//Save the message to database
+			message = messageService.createMessage(message);
 		}
-		
-		//Save the message to database
-		message = messageService.createMessage(message);
 		
 		//Get all the members in the room
 		Set<User> members = message.getRoom().getUsers();

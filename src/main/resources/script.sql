@@ -51,3 +51,13 @@ CREATE TABLE `message` (
   CONSTRAINT `fk_message_room` FOREIGN KEY(`room_id`) REFERENCES room(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `file_info`;
+CREATE TABLE `file_info` (
+  `id` int(11) NOT NULL,
+  `path` nvarchar(1024) DEFAULT NULL,
+  `original_name` nvarchar(1024) DEFAULT NULL,
+
+  CONSTRAINT `fk_file_message` FOREIGN KEY(`id`) REFERENCES message(`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;

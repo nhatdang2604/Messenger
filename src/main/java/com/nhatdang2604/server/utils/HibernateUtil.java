@@ -3,6 +3,7 @@ package com.nhatdang2604.server.utils;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import com.nhatdang2604.server.entities.FileInfo;
 import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
@@ -33,6 +34,7 @@ public enum HibernateUtil {
 					.addAnnotatedClass(Room.class)
 					.addAnnotatedClass(User.class)
 					.addAnnotatedClass(Message.class)
+					.addAnnotatedClass(FileInfo.class)
 					.buildSessionFactory();
 			
 		} catch (Exception e) {

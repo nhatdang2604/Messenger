@@ -28,9 +28,11 @@ public enum FileService {
 	}
 
 	private void copyFile(File original, File copy) {
+		InputStream in = null;
+		OutputStream out = null;
 		try {
-			InputStream in = new BufferedInputStream(new FileInputStream(original));
-			OutputStream out = new BufferedOutputStream(new FileOutputStream(copy));
+			in = new BufferedInputStream(new FileInputStream(original));
+			out = new BufferedOutputStream(new FileOutputStream(copy));
 			byte[] buffer = new byte[1025];
 			int lengthRead;
 			while ((lengthRead = in.read(buffer)) > 0) {
@@ -39,6 +41,9 @@ public enum FileService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (null != in) {try { in.close();} catch(Exception e) {}}	//do nothing if error
+			if (null != out) {try { out.close();} catch(Exception e) {}} //do nothing iff error
 		}
 	}
 	
