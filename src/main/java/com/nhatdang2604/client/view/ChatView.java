@@ -19,8 +19,10 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import com.nhatdang2604.client.view.component.action.ChatLinkListener;
 import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
@@ -30,8 +32,11 @@ public class ChatView extends JDialog {
 	final protected int HEIGHT = 700;
 	final protected int WIDTH = 450;
 	
+	public static final String CHAT_LINK_ACTION_NAME = "chat_link_action";
+	
 	private JButton sendButton;
 	private JButton sendFileButton;
+	
 	private JFileChooser fileChooser;
 	
 	private JTextField typeField;
@@ -112,6 +117,20 @@ public class ChatView extends JDialog {
 		}
 	}
 	
+	public void addLinkToMessagePane(Message message) {
+		String link = message.getContent();
+		StyledDocument doc = messagePane.getStyledDocument();
+		Style regularBlue = doc.addStyle("regularBlue", StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE));
+		StyleConstants.setForeground(regularBlue, Color.BLUE);
+		StyleConstants.setUnderline(regularBlue, true);
+		regularBlue.addAttribute(CHAT_LINK_ACTION_NAME, new ChatLinkListener(message));
+		try {
+			doc.insertString(doc.getLength(), link + "\r\n", regularBlue);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void addNewMessage(Message message) {
 		
 		User client = message.getUser();
@@ -128,7 +147,12 @@ public class ChatView extends JDialog {
 		
 		addTextToMessagePane(message.getDateTime().toString() + ": ", dateColor);
 		addTextToMessagePane(client.getUsername() + ": ", nameColor);
-		addTextToMessagePane(message.getContent() + "\r\n", messageColor);
+		
+		if (Message.TYPE_TEXT == message.getDataType()) {
+			addTextToMessagePane(message.getContent() + "\r\n", messageColor);
+		} else if (Message.TYPE_FILE == message.getDataType()){
+			addLinkToMessagePane(message);
+		}
 		
 		//Add message to the model
 		room.getMessages().add(message);
@@ -160,6 +184,7 @@ public class ChatView extends JDialog {
 	public JButton getSendFileButton() {return sendFileButton;}
 	public JFileChooser getFileChooser() {return fileChooser;}
 	public JTextField getTypeField() {return typeField;}
+	public JTextPane getMessagePane() {return messagePane;}
 	
 	public void clearChat() {
 		this.messagePane.setText("");

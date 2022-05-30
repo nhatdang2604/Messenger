@@ -37,6 +37,25 @@ public enum FileDAO {
 		return info;
 	}
 
+	public FileInfo find(Integer id) {
+		Session session = factory.getCurrentSession();
+		FileInfo info = null;
+		
+		try {
+			session.beginTransaction();
+			info = session.get(FileInfo.class, id);
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+		
+		return info;
+	}
+
 
 	
 }

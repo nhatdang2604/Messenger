@@ -1,5 +1,6 @@
 package com.nhatdang2604.server.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.nhatdang2604.config.Configuration;
-import com.nhatdang2604.server.entities.FileInfo;
 import com.nhatdang2604.server.entities.ISendable;
 import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Packet;
@@ -159,17 +159,23 @@ public enum ServerService {
 
 		//Send the message, if the client is messenging
 		Message message = (Message) packet.getSendable();
+		Packet sendPacket = new Packet();
 		
 		//Process if the message is a file
 		if (Message.TYPE_FILE == message.getDataType()) {
 			
 			message = fileService.recievedFileFromClient(message);
+			sendPacket.setSendType(Packet.TYPE_GET);
 			
 		} else if (Message.TYPE_TEXT == message.getDataType()) {
 			
 			//Save the message to database
 			message = messageService.createMessage(message);
+			sendPacket.setSendType(Packet.TYPE_GET);
 		}
+		
+		
+		sendPacket.setSendable(message);
 		
 		//Get all the members in the room
 		Set<User> members = message.getRoom().getUsers();
@@ -180,11 +186,28 @@ public enum ServerService {
 				
 				Set<Socket> sockets = connectedUsers.get(member.getId());
 				for (Socket soc: sockets) {
-					send(message, soc);
+					
+					send(sendPacket, soc);
 				}
 				
 			}
 		}
+	}
+	
+	public void download(Packet packet, Socket socket) {
+		Message message = (Message) packet.getSendable();
+		Integer id = message.getId();
+		
+		//Get the find with the given id
+		File file = fileService.findFileById(id);
+		
+		//Bind the file to the message to sent
+		message.setFile(file);
+		
+		//Pack the message to send back to client
+		packet.setSendable(message);
+		send(packet, socket);
+		
 	}
 	
 	//Logout a user with a given id
@@ -280,11 +303,16 @@ public enum ServerService {
 				
 			} else if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
 				
-				if (Packet.TYPE_POST == packet.getSendType()) {
+				if (Packet.TYPE_DOWNLOAD_FILE == packet.getSendType()) {
+					download(packet, acceptanceSocket);
+				} else if (Packet.TYPE_POST == packet.getSendType()) {
 					sendMessage(packet, acceptanceSocket);
 				} else if (Packet.TYPE_STOP_THREAD == packet.getSendType()) {
 					Message dummy = (Message) packet.getSendable();
-					send(dummy, acceptanceSocket);
+					Packet pac = new Packet();
+					pac.setSendType(Packet.TYPE_STOP_THREAD);
+					pac.setSendable(dummy);
+					send(pac, acceptanceSocket);
 				}
 				
 			} else if (ISendable.TYPE_ROOM == packet.getSendable().getType()) {

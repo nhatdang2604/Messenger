@@ -2,6 +2,8 @@ package com.nhatdang2604.client.controller;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -12,22 +14,31 @@ import java.net.Socket;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.Element;
+import javax.swing.text.StyledDocument;
 
 import com.nhatdang2604.client.view.ChatView;
 import com.nhatdang2604.client.view.CreateRoomView;
 import com.nhatdang2604.client.view.LoginView;
 import com.nhatdang2604.client.view.MenuView;
 import com.nhatdang2604.client.view.RegistrationView;
+import com.nhatdang2604.client.view.component.action.ChatLinkListener;
 import com.nhatdang2604.config.Configuration;
 import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Packet;
 import com.nhatdang2604.server.entities.Room;
 import com.nhatdang2604.server.entities.User;
+import com.nhatdang2604.server.utils.FileUtil;
 
 public class Controller {
 
 	//Configuration
 	private Configuration config;
+	
+	//Download file buffer
+	private File buffer;
 	
 	//Flag
 	private boolean isOpenChatView;
@@ -52,12 +63,18 @@ public class Controller {
 		
 		//Run until the client app is closed
 		while(isOpenChatView) {
-			Message message = (Message) recieved();
+			Packet packet = (Packet) recieved();
+			Message message = (Message) packet.getSendable();
 			
-			if (chatView.getRoom().getId().equals(message.getRoom().getId())) {
-				chatView.addNewMessage(message);
+			if (Packet.TYPE_GET == packet.getSendType()) {
+				if (chatView.getRoom().getId().equals(message.getRoom().getId())) {
+					chatView.addNewMessage(message);
+				}
+			} else if (Packet.TYPE_DOWNLOAD_FILE == packet.getSendType()) {
+				File file = message.getFile();		//Extract the recieved file
+				FileUtil.copyFile(file, buffer);	//Copy the file to the buffer
+				buffer = null;						//Clear the buffer after copy file
 			}
-			
 		}
 		
 	}
@@ -276,6 +293,76 @@ public class Controller {
 			}
 		});
 		
+		
+		//Setup for downloading file
+		chatView.getMessagePane().addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTextPane messagePane = chatView.getMessagePane();
+				StyledDocument doc = messagePane.getStyledDocument();
+				Element element = doc.getCharacterElement(messagePane.viewToModel(e.getPoint()));
+	            AttributeSet as = element.getAttributes();
+	            ChatLinkListener listener = (ChatLinkListener)as.getAttribute(ChatView.CHAT_LINK_ACTION_NAME);
+	            
+	            //Try to send the message id, to download the file
+	            if(listener != null) {
+	            	
+	            	//Original file's name
+	            	String name = listener.getMessage().getContent();
+	            	
+	            	JFileChooser fileChooser = chatView.getFileChooser();
+	            	
+	            	//Open file chooser
+	            	fileChooser.setSelectedFile(new File(name));
+	    			int state = fileChooser.showSaveDialog(chatView);
+	    			if (JFileChooser.APPROVE_OPTION == state) {
+	    				
+	    				//Create the file to transfer data into
+	    				buffer = fileChooser.getSelectedFile();
+	    				try {
+							buffer.createNewFile();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+	    				
+	    				//Make the message to send to server
+	    				Message message = new Message();
+	    				message.setId(listener.getMessage().getId());
+	
+	    				//Pack the message
+	    				Packet packet = new Packet();
+	    				packet.setSendType(Packet.TYPE_DOWNLOAD_FILE);
+	    				packet.setSendable(message);
+	    				
+	    				//Send
+	    				send(packet);
+	    			}
+	                
+	            }
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				//do nothing
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				//do nothing
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				//do nothing
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				//do nothing
+			}
+			
+		});
 	}
 	
 	private void joinRoomProcess() {

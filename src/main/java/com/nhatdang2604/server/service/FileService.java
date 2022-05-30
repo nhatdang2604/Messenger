@@ -1,18 +1,12 @@
 package com.nhatdang2604.server.service;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import com.nhatdang2604.config.Configuration;
 import com.nhatdang2604.server.dao.FileDAO;
 import com.nhatdang2604.server.entities.FileInfo;
 import com.nhatdang2604.server.entities.Message;
+import com.nhatdang2604.server.utils.FileUtil;
 
 public enum FileService {
 
@@ -26,26 +20,6 @@ public enum FileService {
 		config = Configuration.INSTANCE;
 		fileDAO = FileDAO.INSTANCE;
 		messageService = MessageService.INSTANCE;
-	}
-
-	private void copyFile(File original, File copy) {
-		InputStream in = null;
-		OutputStream out = null;
-		try {
-			in = new BufferedInputStream(new FileInputStream(original));
-			out = new BufferedOutputStream(new FileOutputStream(copy));
-			byte[] buffer = new byte[1025];
-			int lengthRead;
-			while ((lengthRead = in.read(buffer)) > 0) {
-				out.write(buffer, 0, lengthRead);
-			    out.flush();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (null != in) {try { in.close();} catch(Exception e) {}}	//do nothing if error
-			if (null != out) {try { out.close();} catch(Exception e) {}} //do nothing iff error
-		}
 	}
 	
 	public FileInfo copyFileFromClientWithGivenInfo(File original, FileInfo info) {
@@ -75,7 +49,7 @@ public enum FileService {
 		}
 		
 		//Copy for original file to copy file
-		copyFile(original, copy);
+		FileUtil.copyFile(original, copy);
 		
 		//Set new data for info
 		info.setOriginalName(originalName);
@@ -128,5 +102,15 @@ public enum FileService {
 	
 	public FileInfo updateFileInfo(FileInfo info) {
 		return fileDAO.update(info);
+	}
+	
+	public File findFileById(Integer id) {
+		
+		FileInfo info = fileDAO.find(id);
+		
+		File file = new File(info.getPath());
+		
+		return file;
+		
 	}
 }
