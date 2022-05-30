@@ -2,6 +2,7 @@ package com.nhatdang2604.client.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +30,12 @@ public class ChatView extends JDialog {
 	final protected int WIDTH = 450;
 	
 	private JButton sendButton;
+	private JButton sendFileButton;
+	
 	private JTextField typeField;
 	private JTextPane messagePane;
+	
+	private JPanel sendButtonsPanel;
 	private JPanel typePanel;
 	private JPanel messagePanel;
 	private JScrollPane scrollPane;
@@ -41,6 +46,8 @@ public class ChatView extends JDialog {
 	
 	private void initComponents() {
 		sendButton = new JButton("Gửi");
+		sendFileButton = new JButton("Gửi file");
+		
 		typeField = new JTextField();
 		
 		//Init for message pane
@@ -50,6 +57,7 @@ public class ChatView extends JDialog {
 		
 		typePanel = new JPanel();
 		messagePanel = new JPanel();
+		sendButtonsPanel = new JPanel();
 		scrollPane = new JScrollPane(messagePane);
 	}
 	
@@ -59,6 +67,7 @@ public class ChatView extends JDialog {
 		setLayout(new BorderLayout());
 		messagePanel.setLayout(new BorderLayout());
 		typePanel.setLayout(new BorderLayout());
+		sendButtonsPanel.setLayout(new FlowLayout());
 		
 		//Setup for content pane
 		add(messagePanel, BorderLayout.CENTER);
@@ -67,8 +76,12 @@ public class ChatView extends JDialog {
 		//Setup for message panel
 		messagePanel.add(scrollPane, BorderLayout.CENTER);
 		
+		//Setup for buttons panel
+		sendButtonsPanel.add(sendButton);
+		sendButtonsPanel.add(sendFileButton);
+		
 		//Setup for type panel
-		typePanel.add(sendButton, BorderLayout.EAST);
+		typePanel.add(sendButtonsPanel, BorderLayout.EAST);
 		typePanel.add(typeField, BorderLayout.CENTER);
 		
 		
@@ -166,6 +179,7 @@ public class ChatView extends JDialog {
 	}
 	
 	public JButton getSendButton() {return sendButton;}
+	public JButton getSendFileButton() {return sendFileButton;}
 	public JTextField getTypeField() {return typeField;}
 	
 	public void clearChat() {

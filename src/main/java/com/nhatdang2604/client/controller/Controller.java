@@ -226,24 +226,29 @@ public class Controller {
 	private void sendMessageProcessSetup() {
 		chatView.getSendButton().addActionListener(event -> {
 			
-			//Clear the type field
-			chatView.getTypeField().setText("");
+			String content = chatView.getTypeField().getText().trim();
 			
-			//Set data of the message
-			Message message = new Message();
-			message.setUser(user);
-			message.setDataType(Message.TYPE_TEXT);
-			message.setRoom(chatView.getRoom());
-	
-			String content = chatView.getTypeField().getText();
-			message.setContent(content);
-			
-			//Send the message to the server
-			Packet packet = new Packet();
-			packet.setSendType(Packet.TYPE_POST);
-			packet.setSendable(message);
-			packet.setSender(user);
-			send(packet);
+			//Not send empty text
+			if (null != content && !content.equals("")) {
+				
+				//Set data of the message
+				Message message = new Message();
+				message.setUser(user);
+				message.setDataType(Message.TYPE_TEXT);
+				message.setRoom(chatView.getRoom());
+		
+				message.setContent(content);
+				
+				//Send the message to the server
+				Packet packet = new Packet();
+				packet.setSendType(Packet.TYPE_POST);
+				packet.setSendable(message);
+				packet.setSender(user);
+				send(packet);
+				
+				//Clear the type field
+				chatView.getTypeField().setText("");
+			}
 		});
 		
 	}
