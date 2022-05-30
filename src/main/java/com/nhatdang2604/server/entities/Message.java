@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -63,6 +64,13 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 			nullable = true)
 	private Room room;
 	
+	@OneToOne(
+			mappedBy = "message",
+			cascade = CascadeType.ALL,
+			fetch = FetchType.EAGER,
+			optional = true)
+	private FileInfo fileInfo;
+	
 	@Column(name = "content")
 	private String content;
 	
@@ -94,6 +102,14 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 	//Getters and setters
 	public Integer getId() {
 		return id;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 	public void setId(Integer id) {
@@ -148,12 +164,12 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 		this.datetime = datetime;
 	}
 
-	public File getFile() {
-		return file;
+	public FileInfo getFileInfo() {
+		return fileInfo;
 	}
 
-	public void setFile(File file) {
-		this.file = file;
+	public void setFileInfo(FileInfo fileInfo) {
+		this.fileInfo = fileInfo;
 	}
 	
 }

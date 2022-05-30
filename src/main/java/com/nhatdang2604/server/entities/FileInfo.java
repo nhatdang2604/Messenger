@@ -33,7 +33,7 @@ public class FileInfo implements Serializable{
 					CascadeType.PERSIST,
 					CascadeType.REFRESH
 			},
-			fetch = FetchType.LAZY)
+			fetch = FetchType.EAGER)
 	@MapsId
 	@JoinColumn(name = "id")
 	private Message message;

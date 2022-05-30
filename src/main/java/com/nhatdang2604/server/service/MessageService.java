@@ -43,11 +43,15 @@ public enum MessageService {
 //		return message;
 //	}
 	
+	public Message findMessageById(Integer id) {
+		return messageDAO.find(id);
+	}
+	
 	public Message createMessage(Message message) {
 		
 		message.setDateTime(LocalDateTime.now());
 		Message returnMessage = messageDAO.create(message);
-		returnMessage = messageDAO.find(returnMessage.getId());
+		returnMessage = findMessageById(returnMessage.getId());
 		
 		return returnMessage;
 	}

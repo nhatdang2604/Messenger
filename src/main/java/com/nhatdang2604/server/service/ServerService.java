@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.nhatdang2604.config.Configuration;
+import com.nhatdang2604.server.entities.FileInfo;
 import com.nhatdang2604.server.entities.ISendable;
 import com.nhatdang2604.server.entities.Message;
 import com.nhatdang2604.server.entities.Packet;
@@ -156,6 +157,13 @@ public enum ServerService {
 
 		//Send the message, if the client is messenging
 		Message message = (Message) packet.getSendable();
+		
+		//Process if the message is a file
+		if (Message.TYPE_FILE == message.getType()) {
+			
+			FileInfo file = message.getFileInfo();
+			
+		}
 		
 		//Save the message to database
 		message = messageService.createMessage(message);
