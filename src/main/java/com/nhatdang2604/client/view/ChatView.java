@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,6 +32,7 @@ public class ChatView extends JDialog {
 	
 	private JButton sendButton;
 	private JButton sendFileButton;
+	private JFileChooser fileChooser;
 	
 	private JTextField typeField;
 	private JTextPane messagePane;
@@ -47,6 +49,7 @@ public class ChatView extends JDialog {
 	private void initComponents() {
 		sendButton = new JButton("Gửi");
 		sendFileButton = new JButton("Gửi file");
+		fileChooser = new JFileChooser();
 		
 		typeField = new JTextField();
 		
@@ -96,31 +99,6 @@ public class ChatView extends JDialog {
 		setLayout();
 		
 	}
-	
-//	public static void main(String[] args) {
-//		Client client0 = new Client();
-//		client0.setUsername("u1");
-//		client0.setId(1);
-//		ChatView view = new ChatView(client0);
-//		
-//		Message message0 = new Message();
-//		message0.setDateTime(LocalDateTime.now());
-//		message0.setContent("Hello world");
-//		message0.setClient(client0);
-//		
-//		Message message = new Message();
-//		Client client = new Client();
-//		client.setUsername("u2");
-//		client.setId(2);
-//		message.setDateTime(LocalDateTime.now());
-//		message.setContent("Chào thế giới");
-//		message.setClient(client);
-//		
-//		view.addNewMessage(message0);
-//		view.addNewMessage(message);
-//		
-//		view.setVisible(true);
-//	}
 	
 	public void addTextToMessagePane(String text, Color color) {
 		
@@ -180,6 +158,7 @@ public class ChatView extends JDialog {
 	
 	public JButton getSendButton() {return sendButton;}
 	public JButton getSendFileButton() {return sendFileButton;}
+	public JFileChooser getFileChooser() {return fileChooser;}
 	public JTextField getTypeField() {return typeField;}
 	
 	public void clearChat() {

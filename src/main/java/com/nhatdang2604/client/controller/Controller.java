@@ -4,14 +4,14 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
+
+import javax.swing.JFileChooser;
 
 import com.nhatdang2604.client.view.ChatView;
 import com.nhatdang2604.client.view.CreateRoomView;
@@ -246,8 +246,33 @@ public class Controller {
 				packet.setSender(user);
 				send(packet);
 				
-				//Clear the type field
-				chatView.getTypeField().setText("");
+			}
+			
+			//Clear the type field
+			chatView.getTypeField().setText("");
+		});
+		
+		//Setup for send file button
+		chatView.getSendFileButton().addActionListener(event -> {
+			
+			//Open file chooser
+			int state = chatView.getFileChooser().showSaveDialog(chatView);
+			if (JFileChooser.APPROVE_OPTION == state) {
+				File file = chatView.getFileChooser().getSelectedFile();
+				
+				//Set data of the message
+				Message message = new Message();
+				message.setUser(user);
+				message.setDataType(Message.TYPE_FILE);
+				message.setRoom(chatView.getRoom());
+				message.setFile(file);
+				
+				//Send the message to the server
+				Packet packet = new Packet();
+				packet.setSendType(Packet.TYPE_POST);
+				packet.setSendable(message);
+				packet.setSender(user);
+				send(packet);
 			}
 		});
 		

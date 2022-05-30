@@ -1,5 +1,6 @@
 package com.nhatdang2604.server.entities;
 
+import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "message")
@@ -69,6 +71,9 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 	
 	@Column(name = "date_time")
 	private LocalDateTime datetime;
+	
+	@Transient
+	private File file;
 	
 	public Message() {
 		//do nothing
@@ -133,6 +138,22 @@ public class Message implements ISendable, Serializable, Comparable<Message> {
 
 	public void setDateTime(LocalDateTime dateTime) {
 		this.datetime = dateTime;
+	}
+
+	public LocalDateTime getDatetime() {
+		return datetime;
+	}
+
+	public void setDatetime(LocalDateTime datetime) {
+		this.datetime = datetime;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 	
 }
