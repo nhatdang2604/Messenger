@@ -162,7 +162,7 @@ public class RegistrationView extends JDialog {
 		initComponents();
 		setLayout();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 250, 200);
+		setBounds(100, 100, 420, 200);
 		setContentPane(contentPanel);
 		setTitle("Đăng ký");
 		

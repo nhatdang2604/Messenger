@@ -119,13 +119,14 @@ public class CreateRoomView extends JDialog {
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				FormSpecs.DEFAULT_ROWSPEC,}));
 		
+		int offset = 2;
 		for (int i = 0; i<labels.size(); ++i) {
-			String metaLayout = "4, " + (i+2)*2 + ", right, default";
+			String metaLayout = "4, " + (i + offset)*2 + ", right, default";
 			centerPanel.add(labels.get(i), metaLayout);
 		}
 		
 		centerPanel.add(warningText, "6, 2, center, default");
-		int offset = 2;
+		
 		int size = textFields.size();
 		for (int i = 0; i < size ; ++i) {
 			centerPanel.add(textFields.get(i), "6, " + (i + offset) * 2 + ", fill, default");
@@ -143,7 +144,7 @@ public class CreateRoomView extends JDialog {
 		initComponents();
 		setLayout();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 250, 200);
+		setBounds(100, 100, 300, 200);
 		setContentPane(contentPanel);
 		setTitle("Tạo phòng chat");
 		

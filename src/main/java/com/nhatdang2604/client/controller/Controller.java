@@ -405,7 +405,7 @@ public class Controller {
 		
 		//Validate the form first
 		if (createRoomView.areThereAnyEmptyField()) {
-			createRoomView.setError(RegistrationView.EMPTY_FIELD_ERROR);
+			createRoomView.setError(CreateRoomView.EMPTY_FIELD_ERROR);
 			createRoomView.clear();
 			return;
 		}
