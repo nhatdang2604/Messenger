@@ -11,7 +11,7 @@ public enum Configuration {
 	private Configuration() {
 		port = 8888;
 		ip = "localhost";
-		storagePath = "/storage/";
+		storagePath = "storage/";
 	}
 	
 	public int getPort() {return port;}

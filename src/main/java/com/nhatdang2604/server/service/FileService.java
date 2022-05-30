@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -51,10 +52,27 @@ public enum FileService {
 		
 		//Get the name in storage base on file info id
 		String originalName = original.getName();
-		String extension = originalName.substring(originalName.indexOf('.'));
+		int dotIndx = originalName.indexOf('.');
+		
+		String extension = "";
+		if (-1 != dotIndx) {
+			extension = originalName.substring(dotIndx);
+		}
+		
 		String path = config.getStoragePath() + info.getId() + extension;
 		
+		System.out.println(originalName);
+		System.out.println(extension);
+		System.out.println(path);
+		
 		File copy = new File(path);
+		try {
+			if (!copy.exists()) {
+				copy.createNewFile();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		//Copy for original file to copy file
 		copyFile(original, copy);
@@ -73,10 +91,11 @@ public enum FileService {
 		
 		info.setMessage(message);
 		message.setFileInfo(info);
+		message.setContent(file.getName());
 		
 		//Save the message, cause we haven't have the id yet
 		Message saveMessage = messageService.createMessage(message);
-	
+		
 		//Get the id from the save msg
 		info.setId(saveMessage.getId());
 		

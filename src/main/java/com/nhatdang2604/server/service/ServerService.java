@@ -161,9 +161,11 @@ public enum ServerService {
 		Message message = (Message) packet.getSendable();
 		
 		//Process if the message is a file
-		if (Message.TYPE_FILE == message.getType()) {
+		if (Message.TYPE_FILE == message.getDataType()) {
+			
 			message = fileService.recievedFileFromClient(message);
-		} else if (Message.TYPE_TEXT == message.getType()) {
+			
+		} else if (Message.TYPE_TEXT == message.getDataType()) {
 			
 			//Save the message to database
 			message = messageService.createMessage(message);
