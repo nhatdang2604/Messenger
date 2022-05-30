@@ -160,5 +160,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#storage file for the project
+storage/*
+!storage/keepFile
 
 # End of https://www.gitignore.io/api/git,java,maven,eclipse,windows
