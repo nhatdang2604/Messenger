@@ -64,16 +64,23 @@ public class Controller {
 		//Run until the client app is closed
 		while(isOpenChatView) {
 			Packet packet = (Packet) recieved();
-			Message message = (Message) packet.getSendable();
 			
 			if (Packet.TYPE_GET == packet.getSendType()) {
+				Message message = (Message) packet.getSendable();
 				if (chatView.getRoom().getId().equals(message.getRoom().getId())) {
 					chatView.addNewMessage(message);
 				}
 			} else if (Packet.TYPE_DOWNLOAD_FILE == packet.getSendType()) {
+				Message message = (Message) packet.getSendable();
 				File file = message.getFile();		//Extract the recieved file
 				FileUtil.copyFile(file, buffer);	//Copy the file to the buffer
 				buffer = null;						//Clear the buffer after copy file
+			} else if (Packet.TYPE_LOGIN == packet.getSendType()) {
+				User loginUser = (User) packet.getSendable();
+				chatView.addNewOnlineUser(loginUser);
+			} else if (Packet.TYPE_LOGOUT == packet.getSendType()) {
+				User logoutUser = (User) packet.getSendable();
+				chatView.userLogout(logoutUser);
 			}
 		}
 		
@@ -373,8 +380,8 @@ public class Controller {
 		//Packet to send through the internet;
 		Packet packet = new Packet();
 		packet.setSendable(room);
+		packet.setSender(user);
 		packet.setSendType(Packet.TYPE_GET);
-		
 		
 		//Send the packet
 		send(packet);
@@ -453,6 +460,7 @@ public class Controller {
 		chatView.setUser(user);
 		
 		createRoomView.setVisible(false);
+		menuView.getRoomTable().setRowSelectionInterval(0, 0);	//set the selected row to the first row, to avoid error
 	}
 	
 	private void registrateProcess() {
@@ -573,6 +581,7 @@ public class Controller {
 		//Create packet to send through network
 		Packet packet = new Packet();
 		packet.setSendType(Packet.TYPE_LOGOUT);
+		packet.setSender(user);
 						
 		//Send the packet
 		send(packet);

@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -42,6 +45,9 @@ public class ChatView extends JDialog {
 	private JTextField typeField;
 	private JTextPane messagePane;
 	
+	private JList<User> onlineUserList;
+	private DefaultListModel<User> onlineUserModel;
+	
 	private JPanel sendButtonsPanel;
 	private JPanel typePanel;
 	private JPanel messagePanel;
@@ -57,6 +63,9 @@ public class ChatView extends JDialog {
 		fileChooser = new JFileChooser();
 		
 		typeField = new JTextField();
+		
+		onlineUserModel = new DefaultListModel<>();
+		onlineUserList = new JList<>(onlineUserModel);
 		
 		//Init for message pane
 		messagePane = new JTextPane();
@@ -78,8 +87,15 @@ public class ChatView extends JDialog {
 		sendButtonsPanel.setLayout(new FlowLayout());
 		
 		//Setup for content pane
-		add(messagePanel, BorderLayout.CENTER);
-		add(typePanel, BorderLayout.SOUTH);
+		JPanel messageBasePanel = new JPanel();
+		messageBasePanel.setLayout(new BorderLayout());
+		messageBasePanel.add(messagePanel, BorderLayout.CENTER);
+		messageBasePanel.add(typePanel, BorderLayout.SOUTH);
+		
+		add(onlineUserList, BorderLayout.EAST);
+		add(messageBasePanel, BorderLayout.CENTER);
+		//add(messagePanel, BorderLayout.CENTER);
+		//add(typePanel, BorderLayout.SOUTH);
 		
 		//Setup for message panel
 		messagePanel.add(scrollPane, BorderLayout.CENTER);
@@ -165,6 +181,22 @@ public class ChatView extends JDialog {
 	public void setRoom(Room room) {
 		this.room = room;
 		load(room.getMessages());
+		
+		//Set current online user state
+		
+		//Clear old user online state
+		onlineUserModel.removeAllElements();
+		
+		//Find all online users
+		List<User> users = room
+				.getUsers()
+				.stream()
+				.filter(u -> u.getIsOnline())
+				.sorted()
+				.collect(Collectors.toList());
+		
+		//Add them to model
+		users.forEach(u -> onlineUserModel.addElement(u));
 	}
 	
 	public Room getRoom() {
@@ -185,6 +217,7 @@ public class ChatView extends JDialog {
 	public JFileChooser getFileChooser() {return fileChooser;}
 	public JTextField getTypeField() {return typeField;}
 	public JTextPane getMessagePane() {return messagePane;}
+	public JList<User> getOnlineUserList() {return onlineUserList;}
 	
 	public void clearChat() {
 		this.messagePane.setText("");
@@ -193,4 +226,24 @@ public class ChatView extends JDialog {
 		this.setVisible(true);
 	}
 	
+	public void addNewOnlineUser(User newUser) {
+		onlineUserModel.addElement(newUser);
+		onlineUserList.setModel(onlineUserModel);
+	}
+	
+	public void userLogout(User user) {
+		int index = onlineUserModel.indexOf(user);
+		onlineUserModel.remove(index);
+		onlineUserList.setModel(onlineUserModel);
+	}
+	
+//	public static void main(String[] args) {
+//		ChatView view = new ChatView(null);
+//		User user = new User();
+//		user.setUsername("hehe");
+//		
+//		view.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//		view.setVisible(true);
+//		view.addNewOnlineUser(user);
+//	}
 }

@@ -61,6 +61,24 @@ public enum ServerService {
 		}
 	}
 
+	private Set<User> getAllTheOnlineMemberWhoAreTheSameRoomWithGivenUser(User user) {
+		
+		Set<User> buffer = new HashSet<>();
+		Set<Room> rooms = user.getRooms();
+		for (Room room: rooms) {
+			Set<User> members = room.getUsers();
+			for (User member: members) {
+			
+				//Add user to buffer, if the user is already connected to the server
+				if (connectedUsers.containsKey(member.getId())) {
+					buffer.add(member);
+				}
+			}
+		}
+		
+		return buffer;
+	}
+	
 	public void authenticate(Packet packet, Socket socket) {
 		
 		User recievedUser = (User) packet.getSendable();
@@ -93,7 +111,25 @@ public enum ServerService {
 			}
 		}
 		
+		//Sent the auth status for the user
 		send(sentUser, socket);
+		
+		//If the user login successfully, sent online status for all members which are in the same room
+		if (null != sentUser) {
+			
+			Set<User> buffer = getAllTheOnlineMemberWhoAreTheSameRoomWithGivenUser(sentUser);
+			buffer.remove(sentUser);
+			
+			//Send signal for all the user in the buffer
+			Packet pac = new Packet();
+			pac.setSendType(Packet.TYPE_LOGIN);
+			sentUser.setRooms(null);	//no need room
+			pac.setSendable(sentUser);
+			for (User user: buffer) {
+				Set<Socket> sockets = connectedUsers.get(user.getId());
+				sockets.forEach(soc -> send(pac, soc));
+			}
+		}
 		
 	}
 	
@@ -140,18 +176,33 @@ public enum ServerService {
 			room = roomService.findRoomById(room.getId());
 		}
 		
-		//Send the current user state to all the members who are online
+//		//Send the current user state to all the members who are online
+//		Set<User> members = room.getUsers();
+//		for (User member: members) {
+//			if (connectedUsers.containsKey(member.getId())) {
+//				
+//				Set<Socket> sockets = connectedUsers.get(member.getId());
+//				for (Socket soc: sockets) {
+//					send(member, soc);
+//				}
+//				
+//			}
+//		}
+		
+		//Send the current user state back to the sender
+		User sender = packet.getSender();
 		Set<User> members = room.getUsers();
 		for (User member: members) {
-			if (connectedUsers.containsKey(member.getId())) {
-				
-				Set<Socket> sockets = connectedUsers.get(member.getId());
-				for (Socket soc: sockets) {
-					send(member, soc);
-				}
-				
+			if (sender.equals(member)) {
+				sender = member;
+				break;
 			}
 		}
+		Set<Socket> sockets = connectedUsers.get(sender.getId());
+		for (Socket soc: sockets) {
+			send(sender, soc);
+		}
+
 		
 	}
 	
@@ -220,27 +271,59 @@ public enum ServerService {
 		userService.logout(user);
 	}
 	
-	public void logout(Socket socket) {
+	public void logout(Packet packet, Socket socket) {
+		
+		//Exit while in login view
+		if (null != packet.getSender()) {
+			
+			User sender = packet.getSender();
+			Integer key = sender.getId();
+			
+			//Exit after authenticate
+			Set<Socket> sockets = connectedUsers.get(key);
+			
+			sockets.removeIf(soc-> soc.equals(socket));
+			
+			if (sockets.isEmpty()) {
+				connectedUsers.remove(key);
+				logout(key);
+			} else {
+				connectedUsers.put(key, sockets);
+			}
+			
+			//Send signal to all connected user who are member of the same room with the signout user
+			Set<User> buffer = getAllTheOnlineMemberWhoAreTheSameRoomWithGivenUser(sender);
+			
+			Packet pac = new Packet();
+			pac.setSendType(Packet.TYPE_LOGOUT);
+			sender.setRooms(null);	//no need room
+			pac.setSendable(sender);
+			for (User user: buffer) {
+				Set<Socket> socs = connectedUsers.get(user.getId());
+				socs.forEach(soc -> send(pac, soc));
+			}
+			
+		} 
+		
+//		Iterator<Map.Entry<Integer, Set<Socket>>> iterator = connectedUsers.entrySet().iterator();
+//		
+//		while (iterator.hasNext()) {
+//			Map.Entry<Integer, Set<Socket>> entry = iterator.next();
+//			Set<Socket> buffer = entry.getValue();
+//			if(buffer.contains(socket)) {
+//				buffer.removeIf(soc -> soc.equals(socket));	//avoid ConcurrentModificationExpection
+//				
+//				if (buffer.isEmpty()) {
+//					Integer key = entry.getKey();
+//					connectedUsers.remove(entry.getKey());
+//					logout(key);
+//				}
+//				
+//				break;
+//			}
+//		}
 		
 		connectedSockets.removeIf(soc -> soc.equals(socket));
-		Iterator<Map.Entry<Integer, Set<Socket>>> iterator = connectedUsers.entrySet().iterator();
-		
-		while (iterator.hasNext()) {
-			Map.Entry<Integer, Set<Socket>> entry = iterator.next();
-			Set<Socket> buffer = entry.getValue();
-			if(buffer.contains(socket)) {
-				buffer.removeIf(soc -> soc.equals(socket));	//avoid ConcurrentModificationExpection
-				
-				if (buffer.isEmpty()) {
-					Integer key = entry.getKey();
-					connectedUsers.remove(entry.getKey());
-					logout(key);
-				}
-				
-				break;
-			}
-		}
-		
 		try {
 			socket.close();
 			System.out.println(socket + " is disconnected");
@@ -298,7 +381,7 @@ public enum ServerService {
 				if (Packet.TYPE_GET_ALL_USERS == packet.getSendType()) {
 					sendAllUsers(acceptanceSocket);
 				} else if (Packet.TYPE_LOGOUT == packet.getSendType()) {
-					logout(acceptanceSocket);
+					logout(packet, acceptanceSocket);
 				}
 				
 			} else if (ISendable.TYPE_MESSAGE == packet.getSendable().getType()) {
