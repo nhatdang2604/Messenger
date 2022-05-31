@@ -14,11 +14,13 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -87,12 +89,29 @@ public class ChatView extends JDialog {
 		sendButtonsPanel.setLayout(new FlowLayout());
 		
 		//Setup for content pane
+		
 		JPanel messageBasePanel = new JPanel();
 		messageBasePanel.setLayout(new BorderLayout());
 		messageBasePanel.add(messagePanel, BorderLayout.CENTER);
 		messageBasePanel.add(typePanel, BorderLayout.SOUTH);
 		
-		add(onlineUserList, BorderLayout.EAST);
+		String labelText = "Danh sách thành viên online";
+		JLabel label = new JLabel("<html><p style=\"width:80px\">" + labelText +"</p></html>", SwingConstants.CENTER);
+		JPanel onlineUserPanel = new JPanel();
+		JPanel footer = new JPanel();
+		onlineUserPanel.setLayout(new BorderLayout());
+		onlineUserPanel.add(label, BorderLayout.NORTH);
+		
+		JScrollPane scroll = new JScrollPane(onlineUserList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		onlineUserPanel.add(scroll, BorderLayout.CENTER);
+		
+		onlineUserPanel.add(footer, BorderLayout.SOUTH);
+		
+//		onlineUserLabelPanel.add(label, BorderLayout.CENTER);
+//		onlineUserPanel.add(onlineUserLabelPanel, BorderLayout.NORTH);
+//		onlineUserPanel.add(onlineUserListPanel, BorderLayout.CENTER);
+//		
+		add(onlineUserPanel, BorderLayout.EAST);
 		add(messageBasePanel, BorderLayout.CENTER);
 		//add(messagePanel, BorderLayout.CENTER);
 		//add(typePanel, BorderLayout.SOUTH);

@@ -6,6 +6,22 @@ import com.nhatdang2604.server.service.ServerService;
 
 public class Server {
 
+	public static void userControl(ServerService service) {
+		while (true) {
+			System.out.println("Wanna close the server [Y]: ");
+			Scanner scanner = new Scanner(System.in);
+			String buffer = scanner.nextLine().trim();
+			
+			if (buffer.toLowerCase().equals("y")) {
+				service.stop();
+				System.out.println("Server is stopped");
+				break;
+			} else {
+				System.out.println("Invalid: You should only enter 'y' or 'Y' to close the server");
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		ServerService service = ServerService.INSTANCE;
 		Thread serverThread = new Thread(() -> {
@@ -13,16 +29,7 @@ public class Server {
 		});
 		
 		serverThread.start();
-		
-		System.out.println("Wanna close the server [Y/n]: ");
-		Scanner scanner = new Scanner(System.in);
-		String buffer = scanner.nextLine().trim();
-		
-		if (buffer.toLowerCase().equals("y")) {
-			service.stop();
-			System.out.println("Server is stopped");
-		}
-		
+		userControl(service);
 		
 	}
 	

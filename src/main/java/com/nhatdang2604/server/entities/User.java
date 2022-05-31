@@ -117,7 +117,7 @@ public class User implements ISendable, Serializable, Comparable<User> {
 
 	@Override
 	public String toString() {
-		return "Client [username=" + username + "]";
+		return username;
 	}
 
 	@Override
